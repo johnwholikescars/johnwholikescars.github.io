@@ -1,82 +1,69 @@
 <SMASH OR PASS>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smash or Pass</title>
+<title>Smash or Pass?</title>
 
 <style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #0b1220;
-        color: white;
-        text-align: center;
-        overflow: hidden;
-    }
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0b1220;
+    color: white;
+    text-align: center;
+    overflow: hidden;
+}
 
-    h1 {
-        margin-top: 20px;
-    }
+h1 {
+    margin-top: 20px;
+}
 
-    .card {
-        width: 85%;
-        max-width: 420px;
-        margin: 40px auto;
-    }
+.card {
+    width: 85%;
+    max-width: 420px;
+    margin: 40px auto;
+    position: relative;
+    transition: transform 0.3s ease;
+    touch-action: none;
+}
 
-    .card img {
-        width: 100%;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        user-select: none;
-    }
+.card img {
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
 
-    .buttons {
-        margin-top: 20px;
-    }
+.label {
+    position: absolute;
+    top: 20px;
+    font-size: 30px;
+    font-weight: bold;
+    opacity: 0;
+}
 
-    button {
-        padding: 15px 30px;
-        font-size: 18px;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        margin: 10px;
-    }
+.like {
+    right: 20px;
+    color: #22c55e;
+}
 
-    .smash {
-        background: #ef4444;
-        color: white;
-    }
-
-    .pass {
-        background: #3b82f6;
-        color: white;
-    }
-
-    .result {
-        margin-top: 15px;
-        font-size: 22px;
-        font-weight: bold;
-    }
+.nope {
+    left: 20px;
+    color: #ef4444;
+}
 </style>
 </head>
 
 <body>
 
-<h1>Smash or Pass</h1>
+<h1>Smash or Pass?</h1>
 
-<div class="card">
+<div class="card" id="card">
+    <div class="label like" id="like">SMASH 🔨</div>
+    <div class="label nope" id="nope">PASS ❌</div>
     <img id="carImage" src="" alt="Car">
 </div>
-
-<div class="buttons">
-    <button class="smash" onclick="nextCar('smash')">🔨 Smash</button>
-    <button class="pass" onclick="nextCar('pass')">❌ Pass</button>
-</div>
-
-<div class="result" id="result"></div>
 
 <script>
 
@@ -89,32 +76,89 @@ const cars = [
 
 let index = 0;
 
-const carImage = document.getElementById("carImage");
-const result = document.getElementById("result");
+const card = document.getElementById("card");
+const img = document.getElementById("carImage");
+const like = document.getElementById("like");
+const nope = document.getElementById("nope");
 
-// load first image immediately
-carImage.src = cars[index];
+img.src = cars[index];
 
-function nextCar(choice) {
+let startX = 0;
+let currentX = 0;
 
-    // show result text
-    if (choice === "smash") {
-        result.innerHTML = "🔨 SMASH!";
-        result.style.color = "#ef4444";
-    } else {
-        result.innerHTML = "❌ PASS!";
-        result.style.color = "#3b82f6";
-    }
-
-    // move to next image
-    index++;
-
-    if (index >= cars.length) {
-        index = 0;
-    }
-
-    carImage.src = cars[index];
+function start(e) {
+    startX = e.touches ? e.touches[0].clientX : e.clientX;
 }
+
+function move(e) {
+    if (!startX) return;
+
+    currentX = e.touches ? e.touches[0].clientX : e.clientX;
+    let diff = currentX - startX;
+
+    card.style.transform = `translateX(${diff}px) rotate(${diff * 0.05}deg)`;
+
+    if (diff > 80) {
+        like.style.opacity = 1;
+        nope.style.opacity = 0;
+    } else if (diff < -80) {
+        like.style.opacity = 0;
+        nope.style.opacity = 1;
+    } else {
+        like.style.opacity = 0;
+        nope.style.opacity = 0;
+    }
+}
+
+function end() {
+    let diff = currentX - startX;
+
+    if (diff > 120) {
+        swipeRight();
+    } else if (diff < -120) {
+        swipeLeft();
+    } else {
+        reset();
+    }
+
+    startX = 0;
+    currentX = 0;
+}
+
+function swipeRight() {
+    card.style.transform = "translateX(500px) rotate(20deg)";
+    nextCar();
+}
+
+function swipeLeft() {
+    card.style.transform = "translateX(-500px) rotate(-20deg)";
+    nextCar();
+}
+
+function reset() {
+    card.style.transform = "translateX(0)";
+    like.style.opacity = 0;
+    nope.style.opacity = 0;
+}
+
+function nextCar() {
+    setTimeout(() => {
+        index++;
+        if (index >= cars.length) index = 0;
+        img.src = cars[index];
+        reset();
+    }, 200);
+}
+
+// mouse
+card.addEventListener("mousedown", start);
+card.addEventListener("mousemove", move);
+card.addEventListener("mouseup", end);
+
+// touch
+card.addEventListener("touchstart", start);
+card.addEventListener("touchmove", move);
+card.addEventListener("touchend", end);
 
 </script>
 
