@@ -87,12 +87,7 @@
 <script>
 // 🚗 Reliable car images (Wikimedia - won’t break on GitHub Pages)
 const cars = [
-    "https://upload.wikimedia.org/wikipedia/commons/3/3f/Ford_Mustang_GT_2015.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/1/1e/2018_Dodge_Challenger_SRT_Hellcat.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/9/9b/2017_Chevrolet_Camaro_SS.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/7/7e/2015_BMW_M4_%2819902743480%29.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/2/2d/Lamborghini_Huracan_LP610-4_2015.jpg"
-];
+    https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe
 
 let index = 0;
 
