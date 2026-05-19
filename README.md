@@ -1,4 +1,5 @@
 <SMASH OR PASS>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -57,6 +58,15 @@ h1 {
     left: 20px;
     color: #ef4444;
 }
+
+/* 🔥 NEW SMALL FOOTER TEXT */
+.footer {
+    position: fixed;
+    bottom: 10px;
+    width: 100%;
+    font-size: 12px;
+    opacity: 0.5;
+}
 </style>
 </head>
 
@@ -71,9 +81,11 @@ h1 {
     <img id="carImage" src="" alt="Car">
 </div>
 
+<!-- 🔥 NEW FOOTER -->
+<div class="footer">idea by Archer</div>
+
 <script>
 
-// 🚗 YOUR IMAGES
 let cars = [
   "IMG_5026.jpeg",
   "IMG_5030.jpeg",
@@ -81,7 +93,7 @@ let cars = [
   "IMG_5032.jpeg"
 ];
 
-// 🔀 RANDOM SHUFFLE (Fisher-Yates)
+// 🔀 shuffle
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -89,7 +101,7 @@ function shuffle(array) {
     }
 }
 
-shuffle(cars); // shuffle at start
+shuffle(cars);
 
 let index = 0;
 
@@ -162,7 +174,6 @@ function nextCar() {
     setTimeout(() => {
         index++;
 
-        // 🔁 reshuffle when done
         if (index >= cars.length) {
             shuffle(cars);
             index = 0;
