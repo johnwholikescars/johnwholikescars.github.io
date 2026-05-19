@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<SMASH OR PASS>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -87,8 +87,6 @@
 <script>
 // 🚗 Reliable car images (Wikimedia - won’t break on GitHub Pages)
 const cars = [
-    https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe
-
 let index = 0;
 
 const carImage = document.getElementById("carImage");
