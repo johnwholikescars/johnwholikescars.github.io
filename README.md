@@ -116,10 +116,10 @@ h1 {
 <script>
 
 let cars = [
-  "IMG_5026.jpeg",
   "IMG_5030.jpeg",
   "IMG_5031.jpeg",
-  "IMG_5032.jpeg"
+  "IMG_5032.jpeg",
+  "IMG_5034.jpeg"
 ];
 
 function shuffle(array) {
