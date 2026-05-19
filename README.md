@@ -58,7 +58,35 @@ h1 {
     color: #ef4444;
 }
 
-/* 🔥 NEW SMALL FOOTER TEXT */
+/* 🔥 OVERLAY SCREEN */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 80px;
+    font-weight: bold;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 999;
+}
+
+.overlay.smash {
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+}
+
+.overlay.pass {
+    background: rgba(59, 130, 246, 0.9);
+    color: white;
+}
+
+/* footer */
 .footer {
     position: fixed;
     bottom: 10px;
@@ -80,7 +108,9 @@ h1 {
     <img id="carImage" src="" alt="Car">
 </div>
 
-<!-- 🔥 NEW FOOTER -->
+<!-- 🔥 OVERLAY -->
+<div class="overlay smash" id="overlay">SMASH</div>
+
 <div class="footer">idea by Archer</div>
 
 <script>
@@ -92,7 +122,6 @@ let cars = [
   "IMG_5032.jpeg"
 ];
 
-// 🔀 shuffle
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -108,11 +137,22 @@ const card = document.getElementById("card");
 const img = document.getElementById("carImage");
 const like = document.getElementById("like");
 const nope = document.getElementById("nope");
+const overlay = document.getElementById("overlay");
 
 img.src = cars[index];
 
 let startX = 0;
 let currentX = 0;
+
+function showOverlay(type) {
+    overlay.className = "overlay " + type;
+    overlay.textContent = type.toUpperCase();
+    overlay.style.opacity = 1;
+
+    setTimeout(() => {
+        overlay.style.opacity = 0;
+    }, 900);
+}
 
 function start(e) {
     startX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -154,11 +194,13 @@ function end() {
 }
 
 function swipeRight() {
+    showOverlay("smash");
     card.style.transform = "translateX(500px) rotate(20deg)";
     nextCar();
 }
 
 function swipeLeft() {
+    showOverlay("pass");
     card.style.transform = "translateX(-500px) rotate(-20deg)";
     nextCar();
 }
