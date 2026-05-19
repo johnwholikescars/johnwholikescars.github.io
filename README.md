@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Swipe Cars 🚗</title>
+<title>Smash or Pass?</title>
 
 <style>
     body {
@@ -57,7 +57,7 @@
 
 <body>
 
-<h1>Swipe Cars 🚗</h1>
+<h1>Smash or Pass?</h1>
 <p>Swipe right = Smash 🔨 | Swipe left = Pass ❌</p>
 
 <div class="card" id="card">
