@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smash or Pass?</title>
+<title>Smash or Pass</title>
 
 <style>
 body {
@@ -19,7 +19,6 @@ h1 {
     margin-top: 20px;
 }
 
-/* NEW INSTRUCTION TEXT */
 .subtitle {
     margin-top: 5px;
     font-size: 16px;
@@ -63,25 +62,34 @@ h1 {
 
 <body>
 
-<h1>Smash or Pass?</h1>
-
-<!-- 🔥 NEW LINE ADDED -->
-<div class="subtitle">Swipe right to smash 🔨 | Swipe left to pass ❌</div>
+<h1>Smash or Pass</h1>
+<div class="subtitle">Swipe right to smash | Swipe left to pass</div>
 
 <div class="card" id="card">
-    <div class="label like" id="like">SMASH 🔨</div>
-    <div class="label nope" id="nope">PASS ❌</div>
+    <div class="label like" id="like">SMASH</div>
+    <div class="label nope" id="nope">PASS</div>
     <img id="carImage" src="" alt="Car">
 </div>
 
 <script>
 
-const cars = [
+// 🚗 YOUR IMAGES
+let cars = [
   "IMG_5026.jpeg",
   "IMG_5030.jpeg",
   "IMG_5031.jpeg",
-  "IMG_5032.jpeg",
+  "IMG_5032.jpeg"
 ];
+
+// 🔀 RANDOM SHUFFLE (Fisher-Yates)
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+shuffle(cars); // shuffle at start
 
 let index = 0;
 
@@ -153,7 +161,13 @@ function reset() {
 function nextCar() {
     setTimeout(() => {
         index++;
-        if (index >= cars.length) index = 0;
+
+        // 🔁 reshuffle when done
+        if (index >= cars.length) {
+            shuffle(cars);
+            index = 0;
+        }
+
         img.src = cars[index];
         reset();
     }, 200);
