@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smash or Pass 🚗</title>
+<title>Smash or Pass </title>
 
 <style>
     body {
@@ -71,7 +71,7 @@
 
 <body>
 
-<h1>Smash or Pass? 🚗</h1>
+<h1>Smash or Pass? </h1>
 
 <div class="car-container">
     <img id="carImage" src="" alt="Car">
@@ -103,7 +103,7 @@ carImage.src = cars[index];
 
 function nextCar(choice) {
     if (choice === "smash") {
-        result.innerHTML = "🔨 SMASH!";
+        result.innerHTML = " SMASH!";
         result.style.color = "#ef4444";
     } else {
         result.innerHTML = "❌ PASS!";
