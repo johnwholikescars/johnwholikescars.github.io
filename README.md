@@ -15,6 +15,24 @@ body {
     overflow: hidden;
 }
 
+/* MAIN GAME SCREEN */
+#gameScreen {
+    position: relative;
+}
+
+/* END SCREEN */
+#endScreen {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: #0b1220;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
 h1 {
     margin-top: 20px;
 }
@@ -71,35 +89,7 @@ h1 {
     opacity: 0;
     pointer-events: none;
     transition: 0.2s;
-    z-index: 999;
-}
-
-.smashOverlay {
-    background: rgba(239, 68, 68, 0.9);
-}
-
-.passOverlay {
-    background: rgba(59, 130, 246, 0.9);
-}
-
-/* END SCREEN */
-#endScreen {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background: #0b1220;
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    margin-top: 15px;
-    cursor: pointer;
+    z-index: 998;
 }
 
 .footer {
@@ -114,6 +104,9 @@ button {
 
 <body>
 
+<!-- GAME SCREEN -->
+<div id="gameScreen">
+
 <h1>Smash or Pass</h1>
 <div class="subtitle">Swipe right = smash | Swipe left = pass</div>
 
@@ -123,7 +116,9 @@ button {
     <img id="carImage" src="">
 </div>
 
-<div class="overlay smashOverlay" id="overlay"></div>
+<div class="overlay" id="overlay"></div>
+
+</div>
 
 <!-- END SCREEN -->
 <div id="endScreen">
@@ -137,7 +132,7 @@ button {
 <script>
 
 let cars = [
-  "IMG_5034.jpeg",
+  "IMG_5026.jpeg",
   "IMG_5030.jpeg",
   "IMG_5031.jpeg",
   "IMG_5032.jpeg"
@@ -150,6 +145,8 @@ let passCount = 0;
 const card = document.getElementById("card");
 const img = document.getElementById("carImage");
 const overlay = document.getElementById("overlay");
+
+const gameScreen = document.getElementById("gameScreen");
 const endScreen = document.getElementById("endScreen");
 const results = document.getElementById("results");
 
@@ -195,7 +192,7 @@ function end() {
     currentX = 0;
 }
 
-function showOverlay(text, color) {
+function showOverlay(text) {
     overlay.textContent = text;
     overlay.style.opacity = 1;
 
@@ -235,7 +232,7 @@ function nextCar() {
 }
 
 function endGame() {
-    card.style.display = "none";
+    gameScreen.style.display = "none";
     endScreen.style.display = "flex";
 
     results.innerHTML =
