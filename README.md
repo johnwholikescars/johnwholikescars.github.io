@@ -15,24 +15,6 @@ body {
     overflow: hidden;
 }
 
-/* MAIN GAME SCREEN */
-#gameScreen {
-    position: relative;
-}
-
-/* END SCREEN */
-#endScreen {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background: #0b1220;
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-}
-
 h1 {
     margin-top: 20px;
 }
@@ -57,39 +39,32 @@ h1 {
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-.label {
-    position: absolute;
-    top: 20px;
-    font-size: 30px;
-    font-weight: bold;
-    opacity: 0;
-}
-
-.like {
-    right: 20px;
-    color: #22c55e;
-}
-
-.nope {
-    left: 20px;
-    color: #ef4444;
-}
-
-/* OVERLAY */
+/* FULLSCREEN POPUP */
 .overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    font-size: 70px;
+    font-size: 80px;
+    font-weight: bold;
     display: flex;
     justify-content: center;
     align-items: center;
     opacity: 0;
     pointer-events: none;
     transition: 0.2s;
-    z-index: 998;
+    z-index: 999;
+}
+
+.smash {
+    background: rgba(239, 68, 68, 0.95);
+    color: white;
+}
+
+.pass {
+    background: rgba(59, 130, 246, 0.95);
+    color: white;
 }
 
 .footer {
@@ -104,28 +79,15 @@ h1 {
 
 <body>
 
-<!-- GAME SCREEN -->
-<div id="gameScreen">
-
 <h1>Smash or Pass</h1>
 <div class="subtitle">Swipe right = smash | Swipe left = pass</div>
 
 <div class="card" id="card">
-    <div class="label like" id="like">SMASH</div>
-    <div class="label nope" id="nope">PASS</div>
     <img id="carImage" src="">
 </div>
 
-<div class="overlay" id="overlay"></div>
-
-</div>
-
-<!-- END SCREEN -->
-<div id="endScreen">
-    <h1>You're Done!</h1>
-    <p id="results"></p>
-    <button onclick="restart()">Play Again</button>
-</div>
+<!-- FULLSCREEN OVERLAY -->
+<div class="overlay smash" id="overlay"></div>
 
 <div class="footer">idea by Archer</div>
 
@@ -138,18 +100,6 @@ let cars = [
   "IMG_5032.jpeg"
 ];
 
-let index = 0;
-let smashCount = 0;
-let passCount = 0;
-
-const card = document.getElementById("card");
-const img = document.getElementById("carImage");
-const overlay = document.getElementById("overlay");
-
-const gameScreen = document.getElementById("gameScreen");
-const endScreen = document.getElementById("endScreen");
-const results = document.getElementById("results");
-
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -158,6 +108,12 @@ function shuffle(array) {
 }
 
 shuffle(cars);
+
+let index = 0;
+
+const card = document.getElementById("card");
+const img = document.getElementById("carImage");
+const overlay = document.getElementById("overlay");
 
 img.src = cars[index];
 
@@ -192,24 +148,23 @@ function end() {
     currentX = 0;
 }
 
-function showOverlay(text) {
-    overlay.textContent = text;
+function showOverlay(type) {
+    overlay.className = "overlay " + type;
+    overlay.textContent = type.toUpperCase();
     overlay.style.opacity = 1;
 
     setTimeout(() => {
         overlay.style.opacity = 0;
-    }, 500);
+    }, 600);
 }
 
 function swipeRight() {
-    smashCount++;
-    showOverlay("SMASH");
+    showOverlay("smash");
     nextCar();
 }
 
 function swipeLeft() {
-    passCount++;
-    showOverlay("PASS");
+    showOverlay("pass");
     nextCar();
 }
 
@@ -222,25 +177,13 @@ function nextCar() {
         index++;
 
         if (index >= cars.length) {
-            endGame();
-            return;
+            shuffle(cars);
+            index = 0;
         }
 
         img.src = cars[index];
         reset();
     }, 200);
-}
-
-function endGame() {
-    gameScreen.style.display = "none";
-    endScreen.style.display = "flex";
-
-    results.innerHTML =
-        `🔨 Smashes: ${smashCount}<br>❌ Passes: ${passCount}<br>📊 Total: ${cars.length}`;
-}
-
-function restart() {
-    location.reload();
 }
 
 card.addEventListener("mousedown", start);
