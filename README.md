@@ -1,10 +1,9 @@
-# johnwholikescars.github.io
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smash or Pass </title>
+<title>Smash or Pass 🚗</title>
 
 <style>
     body {
@@ -17,6 +16,7 @@
 
     h1 {
         margin-top: 25px;
+        font-size: 2.2em;
     }
 
     .car-container {
@@ -28,7 +28,7 @@
         max-width: 520px;
         border-radius: 15px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        transition: 0.3s;
+        transition: 0.3s ease;
     }
 
     .buttons {
@@ -71,7 +71,7 @@
 
 <body>
 
-<h1>Smash or Pass? </h1>
+<h1>Smash or Pass? 🚗</h1>
 
 <div class="car-container">
     <img id="carImage" src="" alt="Car">
@@ -85,20 +85,27 @@
 <div class="result" id="result"></div>
 
 <script>
+// 🚗 Reliable car images (Wikimedia - won’t break on GitHub Pages)
 const cars = [
-    ";https://commons.wikimedia.org/wiki/File:Breckie_Hill_in_OFTV.png
+    "https://upload.wikimedia.org/wikipedia/commons/3/3f/Ford_Mustang_GT_2015.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/1/1e/2018_Dodge_Challenger_SRT_Hellcat.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/9/9b/2017_Chevrolet_Camaro_SS.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/7/7e/2015_BMW_M4_%2819902743480%29.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/2/2d/Lamborghini_Huracan_LP610-4_2015.jpg"
+];
 
 let index = 0;
 
 const carImage = document.getElementById("carImage");
 const result = document.getElementById("result");
 
-// show first car
+// show first car immediately
 carImage.src = cars[index];
 
 function nextCar(choice) {
+
     if (choice === "smash") {
-        result.innerHTML = " SMASH!";
+        result.innerHTML = "🔨 SMASH!";
         result.style.color = "#ef4444";
     } else {
         result.innerHTML = "❌ PASS!";
@@ -109,12 +116,13 @@ function nextCar(choice) {
     index++;
 
     if (index >= cars.length) {
-        index = 0; // loop back
+        index = 0;
     }
 
+    // small delay so user sees result first
     setTimeout(() => {
         carImage.src = cars[index];
-    }, 300);
+    }, 250);
 }
 </script>
 
