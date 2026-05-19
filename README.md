@@ -1,5 +1,4 @@
 <SMASH OR PASS>
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -18,6 +17,13 @@ body {
 
 h1 {
     margin-top: 20px;
+}
+
+/* NEW INSTRUCTION TEXT */
+.subtitle {
+    margin-top: 5px;
+    font-size: 16px;
+    opacity: 0.8;
 }
 
 .card {
@@ -58,6 +64,9 @@ h1 {
 <body>
 
 <h1>Smash or Pass?</h1>
+
+<!-- 🔥 NEW LINE ADDED -->
+<div class="subtitle">Swipe right to smash 🔨 | Swipe left to pass ❌</div>
 
 <div class="card" id="card">
     <div class="label like" id="like">SMASH 🔨</div>
@@ -150,12 +159,10 @@ function nextCar() {
     }, 200);
 }
 
-// mouse
 card.addEventListener("mousedown", start);
 card.addEventListener("mousemove", move);
 card.addEventListener("mouseup", end);
 
-// touch
 card.addEventListener("touchstart", start);
 card.addEventListener("touchmove", move);
 card.addEventListener("touchend", end);
