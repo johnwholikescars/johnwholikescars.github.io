@@ -70,11 +70,7 @@
 
 // 🚗 LOCAL IMAGES (your folder)
 const cars = [
-    "images/car1.jpg",
-    "images/car2.jpg",
-    "images/car3.jpg",
-    "images/car4.jpg",
-    "images/car5.jpg"
+    "IMG_5026.jpeg"
 ];
 
 let index = 0;
