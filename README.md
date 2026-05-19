@@ -20,7 +20,6 @@ h1 {
 }
 
 .subtitle {
-    margin-top: 5px;
     font-size: 16px;
     opacity: 0.8;
 }
@@ -58,35 +57,51 @@ h1 {
     color: #ef4444;
 }
 
-/* 🔥 OVERLAY SCREEN */
+/* OVERLAY */
 .overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    font-size: 70px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 80px;
-    font-weight: bold;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s ease;
+    transition: 0.2s;
     z-index: 999;
 }
 
-.overlay.smash {
+.smashOverlay {
     background: rgba(239, 68, 68, 0.9);
-    color: white;
 }
 
-.overlay.pass {
+.passOverlay {
     background: rgba(59, 130, 246, 0.9);
-    color: white;
 }
 
-/* footer */
+/* END SCREEN */
+#endScreen {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: #0b1220;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
 .footer {
     position: fixed;
     bottom: 10px;
@@ -100,16 +115,22 @@ h1 {
 <body>
 
 <h1>Smash or Pass</h1>
-<div class="subtitle">Swipe right to smash | Swipe left to pass</div>
+<div class="subtitle">Swipe right = smash | Swipe left = pass</div>
 
 <div class="card" id="card">
     <div class="label like" id="like">SMASH</div>
     <div class="label nope" id="nope">PASS</div>
-    <img id="carImage" src="" alt="Car">
+    <img id="carImage" src="">
 </div>
 
-<!-- 🔥 OVERLAY -->
-<div class="overlay smash" id="overlay">SMASH</div>
+<div class="overlay smashOverlay" id="overlay"></div>
+
+<!-- END SCREEN -->
+<div id="endScreen">
+    <h1>You're Done!</h1>
+    <p id="results"></p>
+    <button onclick="restart()">Play Again</button>
+</div>
 
 <div class="footer">idea by Archer</div>
 
@@ -122,6 +143,16 @@ let cars = [
   "IMG_5032.jpeg"
 ];
 
+let index = 0;
+let smashCount = 0;
+let passCount = 0;
+
+const card = document.getElementById("card");
+const img = document.getElementById("carImage");
+const overlay = document.getElementById("overlay");
+const endScreen = document.getElementById("endScreen");
+const results = document.getElementById("results");
+
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -131,28 +162,10 @@ function shuffle(array) {
 
 shuffle(cars);
 
-let index = 0;
-
-const card = document.getElementById("card");
-const img = document.getElementById("carImage");
-const like = document.getElementById("like");
-const nope = document.getElementById("nope");
-const overlay = document.getElementById("overlay");
-
 img.src = cars[index];
 
 let startX = 0;
 let currentX = 0;
-
-function showOverlay(type) {
-    overlay.className = "overlay " + type;
-    overlay.textContent = type.toUpperCase();
-    overlay.style.opacity = 1;
-
-    setTimeout(() => {
-        overlay.style.opacity = 0;
-    }, 900);
-}
 
 function start(e) {
     startX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -165,17 +178,6 @@ function move(e) {
     let diff = currentX - startX;
 
     card.style.transform = `translateX(${diff}px) rotate(${diff * 0.05}deg)`;
-
-    if (diff > 80) {
-        like.style.opacity = 1;
-        nope.style.opacity = 0;
-    } else if (diff < -80) {
-        like.style.opacity = 0;
-        nope.style.opacity = 1;
-    } else {
-        like.style.opacity = 0;
-        nope.style.opacity = 0;
-    }
 }
 
 function end() {
@@ -193,22 +195,29 @@ function end() {
     currentX = 0;
 }
 
+function showOverlay(text, color) {
+    overlay.textContent = text;
+    overlay.style.opacity = 1;
+
+    setTimeout(() => {
+        overlay.style.opacity = 0;
+    }, 500);
+}
+
 function swipeRight() {
-    showOverlay("smash");
-    card.style.transform = "translateX(500px) rotate(20deg)";
+    smashCount++;
+    showOverlay("SMASH");
     nextCar();
 }
 
 function swipeLeft() {
-    showOverlay("pass");
-    card.style.transform = "translateX(-500px) rotate(-20deg)";
+    passCount++;
+    showOverlay("PASS");
     nextCar();
 }
 
 function reset() {
     card.style.transform = "translateX(0)";
-    like.style.opacity = 0;
-    nope.style.opacity = 0;
 }
 
 function nextCar() {
@@ -216,13 +225,25 @@ function nextCar() {
         index++;
 
         if (index >= cars.length) {
-            shuffle(cars);
-            index = 0;
+            endGame();
+            return;
         }
 
         img.src = cars[index];
         reset();
     }, 200);
+}
+
+function endGame() {
+    card.style.display = "none";
+    endScreen.style.display = "flex";
+
+    results.innerHTML =
+        `🔨 Smashes: ${smashCount}<br>❌ Passes: ${passCount}<br>📊 Total: ${cars.length}`;
+}
+
+function restart() {
+    location.reload();
 }
 
 card.addEventListener("mousedown", start);
