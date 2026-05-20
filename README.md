@@ -1,4 +1,5 @@
 <SMASH OR PASS>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -19,14 +20,16 @@ body {
     height: 100vh;
 }
 
-/* INSTRUCTIONS */
+/* INSTRUCTIONS (FIXED & TRULY CENTERED) */
 .subtitle {
     position: fixed;
-    top: 15px;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
     font-size: 16px;
     opacity: 0.8;
-    width: 100%;
     text-align: center;
+    white-space: nowrap;
 }
 
 /* CARD */
@@ -78,7 +81,6 @@ body {
 
 <body>
 
-<!-- INSTRUCTIONS ONLY -->
 <div class="subtitle">Swipe right to smash | Swipe left to pass</div>
 
 <div class="card" id="card">
