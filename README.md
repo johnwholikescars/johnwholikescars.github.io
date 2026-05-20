@@ -13,14 +13,23 @@ body {
     color: white;
     overflow: hidden;
 
-    /* center everything vertically */
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
 }
 
-/* CARD AREA */
+/* INSTRUCTIONS */
+.subtitle {
+    position: fixed;
+    top: 15px;
+    font-size: 16px;
+    opacity: 0.8;
+    width: 100%;
+    text-align: center;
+}
+
+/* CARD */
 .card {
     width: 90%;
     max-width: 420px;
@@ -31,7 +40,7 @@ body {
 
 .card img {
     width: 100%;
-    max-height: 85vh;   /* prevents tall images going off screen */
+    max-height: 85vh;
     object-fit: contain;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -69,6 +78,9 @@ body {
 
 <body>
 
+<!-- INSTRUCTIONS ONLY -->
+<div class="subtitle">Swipe right to smash | Swipe left to pass</div>
+
 <div class="card" id="card">
     <img id="carImage" src="">
 </div>
@@ -90,7 +102,6 @@ let cars = [
   "IMG_5030.jpeg",
 ];
 
-// shuffle
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
