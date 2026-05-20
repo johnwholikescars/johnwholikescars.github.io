@@ -97,7 +97,13 @@ let cars = [
   "IMG_5034.jpeg",
   "IMG_5030.jpeg",
   "IMG_5031.jpeg",
-  "IMG_5032.jpeg"
+  "IMG_5032.jpeg",
+  "IMG_5036.jpeg",
+  "IMG_5037.jpeg",
+  "IMG_5038.jpeg",
+  "IMG_5040.jpeg",
+  "IMG_5041.jpeg",
+  "IMG_5043.jpeg",
 ];
 
 function shuffle(array) {
