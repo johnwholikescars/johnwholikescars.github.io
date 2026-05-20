@@ -18,7 +18,6 @@ body {
     height: 100vh;
 }
 
-/* INSTRUCTIONS */
 .subtitle {
     position: fixed;
     top: 8px;
@@ -29,7 +28,6 @@ body {
     white-space: nowrap;
 }
 
-/* CARD */
 .card {
     width: 90%;
     max-width: 420px;
@@ -46,13 +44,9 @@ body {
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* OVERLAY */
 .overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     font-size: 80px;
     font-weight: bold;
     display: flex;
@@ -63,11 +57,9 @@ body {
     transition: 0.2s;
     z-index: 999;
 }
-
 .smash { background: rgba(239,68,68,0.95); }
 .pass  { background: rgba(59,130,246,0.95); }
 
-/* END SCREEN */
 .endScreen {
     position: fixed;
     inset: 0;
@@ -78,6 +70,15 @@ body {
     flex-direction: column;
     font-size: 28px;
     z-index: 1000;
+}
+
+button {
+    margin-top: 30px;
+    padding: 12px 24px;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
 }
 </style>
 </head>
@@ -94,35 +95,17 @@ body {
 
 <div class="endScreen" id="endScreen">
     <div id="results"></div>
+    <button onclick="playAgain()">Play Again</button>
 </div>
 
 <script>
-
 let cars = [
-  "IMG_5043.jpeg",
-  "IMG_5041.jpeg",
-  "IMG_5040.jpeg",
-  "IMG_5038.jpeg",
-  "IMG_5037.jpeg",
-  "IMG_5036.jpeg",
-  "IMG_5034.jpeg",
-  "IMG_5032.jpeg",
-  "IMG_5031.jpeg",
-  "IMG_5030.jpeg"
+  "IMG_5043.jpeg","IMG_5041.jpeg","IMG_5040.jpeg","IMG_5038.jpeg",
+  "IMG_5037.jpeg","IMG_5036.jpeg","IMG_5034.jpeg","IMG_5032.jpeg",
+  "IMG_5031.jpeg","IMG_5030.jpeg"
 ];
 
-let smashCount = 0;
-let passCount = 0;
-
-function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-shuffle(cars);
-
-let index = 0;
+let smashCount = 0, passCount = 0, index = 0;
 
 const card = document.getElementById("card");
 const img = document.getElementById("carImage");
@@ -130,86 +113,75 @@ const overlay = document.getElementById("overlay");
 const endScreen = document.getElementById("endScreen");
 const results = document.getElementById("results");
 
-img.src = cars[index];
-
-let startX = 0;
-let currentX = 0;
-
-function start(e) {
-    startX = e.touches ? e.touches[0].clientX : e.clientX;
+function shuffle(a){
+  for (let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
 }
 
-function move(e) {
-    if (!startX) return;
-    currentX = e.touches ? e.touches[0].clientX : e.clientX;
-    let diff = currentX - startX;
-    card.style.transform = `translateX(${diff}px) rotate(${diff * 0.05}deg)`;
+function startGame(){
+  shuffle(cars);
+  index=0;
+  smashCount=0;
+  passCount=0;
+  img.src=cars[index];
+  endScreen.style.display="none";
+}
+startGame();
+
+let startX=0,currentX=0;
+
+function start(e){ startX=(e.touches?e.touches[0].clientX:e.clientX); }
+function move(e){
+  if(!startX)return;
+  currentX=(e.touches?e.touches[0].clientX:e.clientX);
+  let d=currentX-startX;
+  card.style.transform=`translateX(${d}px) rotate(${d*0.05}deg)`;
+}
+function end(){
+  let d=currentX-startX;
+  if(d>120) swipe("smash");
+  else if(d<-120) swipe("pass");
+  else card.style.transform="translateX(0)";
+  startX=0; currentX=0;
 }
 
-function end() {
-    let diff = currentX - startX;
+function swipe(type){
+  overlay.className="overlay "+type;
+  overlay.textContent=type.toUpperCase();
+  overlay.style.opacity=1;
+  setTimeout(()=>overlay.style.opacity=0,600);
 
-    if (diff > 120) swipeRight();
-    else if (diff < -120) swipeLeft();
-    else reset();
+  if(type==="smash") smashCount++; else passCount++;
 
-    startX = 0;
-    currentX = 0;
+  setTimeout(()=>{
+    index++;
+    if(index>=cars.length) showResults();
+    else{
+      img.src=cars[index];
+      card.style.transform="translateX(0)";
+    }
+  },200);
 }
 
-function showOverlay(type) {
-    overlay.className = "overlay " + type;
-    overlay.textContent = type.toUpperCase();
-    overlay.style.opacity = 1;
-    setTimeout(() => overlay.style.opacity = 0, 600);
+function showResults(){
+  endScreen.style.display="flex";
+  results.innerHTML=`
+    <div>Results</div>
+    <div style="margin-top:20px;">Smashes: ${smashCount}</div>
+    <div>Passes: ${passCount}</div>
+  `;
 }
 
-function swipeRight() {
-    smashCount++;
-    showOverlay("smash");
-    nextCar();
-}
+function playAgain(){ startGame(); }
 
-function swipeLeft() {
-    passCount++;
-    showOverlay("pass");
-    nextCar();
-}
-
-function reset() {
-    card.style.transform = "translateX(0)";
-}
-
-function nextCar() {
-    setTimeout(() => {
-        index++;
-
-        if (index >= cars.length) {
-            showResults();
-            return;
-        }
-
-        img.src = cars[index];
-        reset();
-    }, 200);
-}
-
-function showResults() {
-    endScreen.style.display = "flex";
-    results.innerHTML = `
-        <div>Results</div>
-        <div style="margin-top:20px;">Smashes: ${smashCount}</div>
-        <div>Passes: ${passCount}</div>
-    `;
-}
-
-card.addEventListener("mousedown", start);
-card.addEventListener("mousemove", move);
-card.addEventListener("mouseup", end);
-card.addEventListener("touchstart", start);
-card.addEventListener("touchmove", move);
-card.addEventListener("touchend", end);
-
+card.addEventListener("mousedown",start);
+card.addEventListener("mousemove",move);
+card.addEventListener("mouseup",end);
+card.addEventListener("touchstart",start);
+card.addEventListener("touchmove",move);
+card.addEventListener("touchend",end);
 </script>
 
 </body>
