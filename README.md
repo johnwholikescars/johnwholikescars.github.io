@@ -12,14 +12,13 @@ body {
     background: #0b1220;
     color: white;
     overflow: hidden;
-
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
 }
 
-/* INSTRUCTIONS (FIXED & TRULY CENTERED) */
+/* INSTRUCTIONS */
 .subtitle {
     position: fixed;
     top: 8px;
@@ -27,7 +26,6 @@ body {
     transform: translateX(-50%);
     font-size: 16px;
     opacity: 0.8;
-    text-align: center;
     white-space: nowrap;
 }
 
@@ -66,14 +64,20 @@ body {
     z-index: 999;
 }
 
-.smash {
-    background: rgba(239, 68, 68, 0.95);
-    color: white;
-}
+.smash { background: rgba(239,68,68,0.95); }
+.pass  { background: rgba(59,130,246,0.95); }
 
-.pass {
-    background: rgba(59, 130, 246, 0.95);
-    color: white;
+/* END SCREEN */
+.endScreen {
+    position: fixed;
+    inset: 0;
+    background: #0b1220;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-size: 28px;
+    z-index: 1000;
 }
 </style>
 </head>
@@ -86,7 +90,11 @@ body {
     <img id="carImage" src="">
 </div>
 
-<div class="overlay smash" id="overlay"></div>
+<div class="overlay" id="overlay"></div>
+
+<div class="endScreen" id="endScreen">
+    <div id="results"></div>
+</div>
 
 <script>
 
@@ -100,8 +108,11 @@ let cars = [
   "IMG_5034.jpeg",
   "IMG_5032.jpeg",
   "IMG_5031.jpeg",
-  "IMG_5030.jpeg",
+  "IMG_5030.jpeg"
 ];
+
+let smashCount = 0;
+let passCount = 0;
 
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -109,7 +120,6 @@ function shuffle(array) {
         [array[i], array[j]] = [array[j], array[i]];
     }
 }
-
 shuffle(cars);
 
 let index = 0;
@@ -117,6 +127,8 @@ let index = 0;
 const card = document.getElementById("card");
 const img = document.getElementById("carImage");
 const overlay = document.getElementById("overlay");
+const endScreen = document.getElementById("endScreen");
+const results = document.getElementById("results");
 
 img.src = cars[index];
 
@@ -129,23 +141,17 @@ function start(e) {
 
 function move(e) {
     if (!startX) return;
-
     currentX = e.touches ? e.touches[0].clientX : e.clientX;
     let diff = currentX - startX;
-
     card.style.transform = `translateX(${diff}px) rotate(${diff * 0.05}deg)`;
 }
 
 function end() {
     let diff = currentX - startX;
 
-    if (diff > 120) {
-        swipeRight();
-    } else if (diff < -120) {
-        swipeLeft();
-    } else {
-        reset();
-    }
+    if (diff > 120) swipeRight();
+    else if (diff < -120) swipeLeft();
+    else reset();
 
     startX = 0;
     currentX = 0;
@@ -155,18 +161,17 @@ function showOverlay(type) {
     overlay.className = "overlay " + type;
     overlay.textContent = type.toUpperCase();
     overlay.style.opacity = 1;
-
-    setTimeout(() => {
-        overlay.style.opacity = 0;
-    }, 600);
+    setTimeout(() => overlay.style.opacity = 0, 600);
 }
 
 function swipeRight() {
+    smashCount++;
     showOverlay("smash");
     nextCar();
 }
 
 function swipeLeft() {
+    passCount++;
     showOverlay("pass");
     nextCar();
 }
@@ -180,8 +185,8 @@ function nextCar() {
         index++;
 
         if (index >= cars.length) {
-            shuffle(cars);
-            index = 0;
+            showResults();
+            return;
         }
 
         img.src = cars[index];
@@ -189,10 +194,18 @@ function nextCar() {
     }, 200);
 }
 
+function showResults() {
+    endScreen.style.display = "flex";
+    results.innerHTML = `
+        <div>Results</div>
+        <div style="margin-top:20px;">Smashes: ${smashCount}</div>
+        <div>Passes: ${passCount}</div>
+    `;
+}
+
 card.addEventListener("mousedown", start);
 card.addEventListener("mousemove", move);
 card.addEventListener("mouseup", end);
-
 card.addEventListener("touchstart", start);
 card.addEventListener("touchmove", move);
 card.addEventListener("touchend", end);
