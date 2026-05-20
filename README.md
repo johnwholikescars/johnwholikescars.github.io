@@ -11,23 +11,19 @@ body {
     font-family: Arial;
     background: #0b1220;
     color: white;
-    text-align: center;
     overflow: hidden;
+
+    /* center everything vertically */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-h1 {
-    margin-top: 20px;
-}
-
-.subtitle {
-    font-size: 16px;
-    opacity: 0.8;
-}
-
+/* CARD AREA */
 .card {
-    width: 85%;
+    width: 90%;
     max-width: 420px;
-    margin: 40px auto;
     position: relative;
     transition: transform 0.3s ease;
     touch-action: none;
@@ -35,11 +31,13 @@ h1 {
 
 .card img {
     width: 100%;
+    max-height: 85vh;   /* prevents tall images going off screen */
+    object-fit: contain;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* FULLSCREEN POPUP */
+/* OVERLAY */
 .overlay {
     position: fixed;
     top: 0;
@@ -66,46 +64,33 @@ h1 {
     background: rgba(59, 130, 246, 0.95);
     color: white;
 }
-
-.footer {
-    position: fixed;
-    bottom: 10px;
-    width: 100%;
-    font-size: 12px;
-    opacity: 0.5;
-}
 </style>
 </head>
 
 <body>
 
-<h1>Smash or Pass</h1>
-<div class="subtitle">Swipe right = smash | Swipe left = pass</div>
-
 <div class="card" id="card">
     <img id="carImage" src="">
 </div>
 
-<!-- FULLSCREEN OVERLAY -->
 <div class="overlay smash" id="overlay"></div>
-
-<div class="footer">idea by Archer</div>
 
 <script>
 
 let cars = [
-  "IMG_5034.jpeg",
-  "IMG_5030.jpeg",
-  "IMG_5031.jpeg",
-  "IMG_5032.jpeg",
-  "IMG_5036.jpeg",
-  "IMG_5037.jpeg",
-  "IMG_5038.jpeg",
-  "IMG_5040.jpeg",
-  "IMG_5041.jpeg",
   "IMG_5043.jpeg",
+  "IMG_5041.jpeg",
+  "IMG_5040.jpeg",
+  "IMG_5038.jpeg",
+  "IMG_5037.jpeg",
+  "IMG_5036.jpeg",
+  "IMG_5034.jpeg",
+  "IMG_5032.jpeg",
+  "IMG_5031.jpeg",
+  "IMG_5030.jpeg",
 ];
 
+// shuffle
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
