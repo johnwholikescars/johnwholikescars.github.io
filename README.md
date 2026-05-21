@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -7,13 +8,14 @@
 <style>
 body {
   margin: 0;
-  background: #111;
+  background: #0f0f0f;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   font-family: Arial;
   color: white;
+  overflow: hidden;
 }
 
 .card {
@@ -23,10 +25,8 @@ body {
   overflow: hidden;
   background: #222;
   position: relative;
-  transition: transform 0.4s ease, opacity 0.4s ease;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  transition: transform 0.2s ease;
+  touch-action: none;
 }
 
 .card img {
@@ -35,20 +35,23 @@ body {
   object-fit: cover;
 }
 
-.swipe-right {
-  transform: translateX(450px) rotate(18deg);
+/* swipe feedback overlays */
+.overlay {
+  position: absolute;
+  top: 20px;
+  font-size: 40px;
+  font-weight: bold;
   opacity: 0;
+  transition: opacity 0.2s ease;
 }
 
-.swipe-left {
-  transform: translateX(-450px) rotate(-18deg);
-  opacity: 0;
-}
+.like { left: 20px; color: #4dff88; }
+.nope { right: 20px; color: #ff4d4d; }
 
-/* ⬇️ moved buttons lower */
+/* buttons */
 .buttons {
   position: fixed;
-  bottom: 15px;
+  bottom: 10px;
   display: flex;
   gap: 20px;
 }
@@ -64,7 +67,7 @@ button {
 #pass { background: #ff4d4d; color: white; }
 #smash { background: #4dff88; color: black; }
 
-/* 📊 end screen */
+/* end screen */
 #endScreen {
   position: absolute;
   text-align: center;
@@ -76,7 +79,11 @@ button {
 <body>
 
 <div class="card" id="card">
+  <div class="overlay like" id="likeText">SMASH 🔥</div>
+  <div class="overlay nope" id="nopeText">PASS 👎</div>
+
   <img id="img" src="" />
+
   <div id="endScreen"></div>
 </div>
 
@@ -87,7 +94,9 @@ button {
 
 <script>
 
-// 🔥 IMAGES (ROOT LEVEL GITHUB PAGES)
+// =======================
+// IMAGES (GITHUB ROOT)
+// =======================
 let images = [];
 
 for (let i = 5076; i >= 5066; i--) {
@@ -105,40 +114,54 @@ function shuffle(arr) {
 
 images = shuffle(images);
 
+// =======================
 let index = 0;
-let smashCount = 0;
-let passCount = 0;
+let smash = 0;
+let pass = 0;
 
-const img = document.getElementById("img");
 const card = document.getElementById("card");
+const img = document.getElementById("img");
+const likeText = document.getElementById("likeText");
+const nopeText = document.getElementById("nopeText");
 const endScreen = document.getElementById("endScreen");
 
+let startX = 0;
+let currentX = 0;
+
+// =======================
+// LOAD IMAGE
+// =======================
 function load() {
   if (index >= images.length) {
-    showResults();
+    end();
     return;
   }
-
   img.src = images[index];
 }
 
-function showResults() {
+// =======================
+// END SCREEN
+// =======================
+function end() {
   img.style.display = "none";
   document.querySelector(".buttons").style.display = "none";
 
   endScreen.style.display = "block";
   endScreen.innerHTML = `
     <h2>Done!</h2>
-    <p>🔥 Smashes: ${smashCount}</p>
-    <p>👎 Passes: ${passCount}</p>
+    <p>🔥 Smashes: ${smash}</p>
+    <p>👎 Passes: ${pass}</p>
     <button onclick="restart()">Play Again</button>
   `;
 }
 
+// =======================
+// RESTART
+// =======================
 function restart() {
   index = 0;
-  smashCount = 0;
-  passCount = 0;
+  smash = 0;
+  pass = 0;
 
   images = shuffle(images);
 
@@ -149,40 +172,76 @@ function restart() {
   load();
 }
 
+// =======================
+// SWIPE ACTION
+// =======================
 function swipe(dir) {
+
   if (dir === "right") {
-    smashCount++;
-    card.classList.add("swipe-right");
+    smash++;
+    card.style.transform = "translateX(500px) rotate(20deg)";
+    likeText.style.opacity = 1;
   } else {
-    passCount++;
-    card.classList.add("swipe-left");
+    pass++;
+    card.style.transform = "translateX(-500px) rotate(-20deg)";
+    nopeText.style.opacity = 1;
   }
 
+  // vibration (mobile)
+  if (navigator.vibrate) navigator.vibrate(80);
+
   setTimeout(() => {
-    card.classList.remove("swipe-right", "swipe-left");
+    card.style.transition = "none";
+    card.style.transform = "translateX(0px) rotate(0deg)";
+    likeText.style.opacity = 0;
+    nopeText.style.opacity = 0;
+
     index++;
     load();
-  }, 400);
+
+    setTimeout(() => {
+      card.style.transition = "transform 0.2s ease";
+    }, 50);
+
+  }, 250);
 }
 
-// buttons
+// =======================
+// BUTTONS
+// =======================
 document.getElementById("pass").onclick = () => swipe("left");
 document.getElementById("smash").onclick = () => swipe("right");
 
-// touch swipe
-let startX = 0;
-
-card.addEventListener("touchstart", e => {
+// =======================
+// DRAG SYSTEM (REAL FEEL)
+// =======================
+card.addEventListener("touchstart", (e) => {
   startX = e.touches[0].clientX;
 });
 
-card.addEventListener("touchend", e => {
-  let endX = e.changedTouches[0].clientX;
+card.addEventListener("touchmove", (e) => {
+  currentX = e.touches[0].clientX;
+  let diff = currentX - startX;
 
-  if (endX - startX > 80) swipe("right");
-  else if (startX - endX > 80) swipe("left");
+  card.style.transform = `translateX(${diff}px) rotate(${diff / 20}deg)`;
+
+  likeText.style.opacity = diff > 50 ? 1 : 0;
+  nopeText.style.opacity = diff < -50 ? 1 : 0;
 });
 
+card.addEventListener("touchend", () => {
+  let diff = currentX - startX;
+
+  if (diff > 100) swipe("right");
+  else if (diff < -100) swipe("left");
+  else {
+    card.style.transform = "translateX(0px)";
+    likeText.style.opacity = 0;
+    nopeText.style.opacity = 0;
+  }
+});
+
+// =======================
 load();
 
 </script>
