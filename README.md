@@ -34,7 +34,7 @@ body {
   object-fit: cover;
 }
 
-/* 🔥 BIG OVERLAY TEXT */
+/* 🔥 OVERLAY TEXT */
 .overlay {
   position: absolute;
   top: 40px;
@@ -43,6 +43,8 @@ body {
   opacity: 0;
   transition: opacity 0.2s ease;
   text-shadow: 0 0 15px rgba(0,0,0,0.8);
+  z-index: 5;
+  pointer-events: none;
 }
 
 .like {
@@ -55,7 +57,7 @@ body {
   color: #ff4d4d;
 }
 
-/* buttons lower */
+/* buttons */
 .buttons {
   position: fixed;
   bottom: 15px;
@@ -71,10 +73,17 @@ button {
   font-size: 16px;
 }
 
-#pass { background: #ff4d4d; color: white; }
-#smash { background: #4dff88; color: black; }
+#pass {
+  background: #ff4d4d;
+  color: white;
+}
 
-/* end screen fixed centering */
+#smash {
+  background: #4dff88;
+  color: black;
+}
+
+/* end screen */
 #endScreen {
   position: absolute;
   inset: 0;
@@ -91,17 +100,17 @@ button {
   justify-content: center;
 }
 
-/* swipe animation */
+/* swipe animations */
 .swipe-right {
   transform: translateX(520px) rotate(25deg);
-  transition: transform 0.4s ease, opacity 0.4s ease;
   opacity: 0;
+  transition: transform 0.4s ease, opacity 0.4s ease;
 }
 
 .swipe-left {
   transform: translateX(-520px) rotate(-25deg);
-  transition: transform 0.4s ease, opacity 0.4s ease;
   opacity: 0;
+  transition: transform 0.4s ease, opacity 0.4s ease;
 }
 </style>
 </head>
@@ -129,7 +138,7 @@ button {
 <script>
 
 // =====================
-// IMAGES (ROOT GITHUB PAGES)
+// IMAGES
 // =====================
 let images = [];
 
@@ -164,16 +173,23 @@ let startX = 0;
 let currentX = 0;
 
 // =====================
+// LOAD IMAGE
+// =====================
 function load() {
+
   if (index >= images.length) {
     end();
     return;
   }
+
   img.src = images[index];
 }
 
 // =====================
+// END SCREEN
+// =====================
 function end() {
+
   img.style.display = "none";
   document.querySelector(".buttons").style.display = "none";
 
@@ -183,14 +199,25 @@ function end() {
     <h2>Done!</h2>
     <p style="font-size:20px;">🔥 Smashes: ${smash}</p>
     <p style="font-size:20px;">👎 Passes: ${pass}</p>
-    <button onclick="restart()" style="margin-top:10px; padding:10px 15px; border:none; border-radius:10px;">
+
+    <button onclick="restart()"
+      style="
+      margin-top:10px;
+      padding:10px 15px;
+      border:none;
+      border-radius:10px;
+      cursor:pointer;
+    ">
       Play Again
     </button>
   `;
 }
 
 // =====================
+// RESTART
+// =====================
 function restart() {
+
   index = 0;
   smash = 0;
   pass = 0;
@@ -205,35 +232,56 @@ function restart() {
 }
 
 // =====================
-// 🔥 FIXED LONGER EFFECT SWIPE
+// 🔥 FIXED SWIPE FUNCTION
 // =====================
 function swipe(dir) {
 
+  // show overlay FIRST
   if (dir === "right") {
     smash++;
     likeText.style.opacity = 1;
-    card.classList.add("swipe-right");
   } else {
     pass++;
     nopeText.style.opacity = 1;
-    card.classList.add("swipe-left");
   }
 
-  // ⏱ LONGER VISIBILITY
+  // vibration
+  if (navigator.vibrate) navigator.vibrate(150);
+
+  // pause so user sees overlay
   setTimeout(() => {
 
-    if (navigator.vibrate) navigator.vibrate(150);
+    // move card AFTER overlay appears
+    if (dir === "right") {
+      card.classList.add("swipe-right");
+    } else {
+      card.classList.add("swipe-left");
+    }
+
+    // prepare next image
+    index++;
 
     setTimeout(() => {
 
+      // reset instantly
       card.classList.remove("swipe-right", "swipe-left");
+
+      card.style.transition = "none";
+      card.style.transform = "translateX(0px) rotate(0deg)";
+
+      // hide overlays
       likeText.style.opacity = 0;
       nopeText.style.opacity = 0;
 
-      index++;
+      // load next image immediately
       load();
 
-    }, 500); // 👈 longer delay so you SEE effect
+      // restore transitions
+      setTimeout(() => {
+        card.style.transition = "transform 0.25s ease";
+      }, 50);
+
+    }, 400);
 
   }, 300);
 }
@@ -245,34 +293,46 @@ document.getElementById("pass").onclick = () => swipe("left");
 document.getElementById("smash").onclick = () => swipe("right");
 
 // =====================
-// DRAG SWIPE
+// TOUCH DRAG
 // =====================
 card.addEventListener("touchstart", e => {
   startX = e.touches[0].clientX;
 });
 
 card.addEventListener("touchmove", e => {
+
   currentX = e.touches[0].clientX;
+
   let diff = currentX - startX;
 
-  card.style.transform = `translateX(${diff}px) rotate(${diff / 18}deg)`;
+  card.style.transform =
+    `translateX(${diff}px) rotate(${diff / 18}deg)`;
 
   likeText.style.opacity = diff > 50 ? 1 : 0;
   nopeText.style.opacity = diff < -50 ? 1 : 0;
 });
 
 card.addEventListener("touchend", () => {
+
   let diff = currentX - startX;
 
-  if (diff > 100) swipe("right");
-  else if (diff < -100) swipe("left");
+  if (diff > 100) {
+    swipe("right");
+  }
+  else if (diff < -100) {
+    swipe("left");
+  }
   else {
-    card.style.transform = "translateX(0px)";
+
+    card.style.transform =
+      "translateX(0px) rotate(0deg)";
+
     likeText.style.opacity = 0;
     nopeText.style.opacity = 0;
   }
 });
 
+// =====================
 load();
 
 </script>
