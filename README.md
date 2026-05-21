@@ -33,11 +33,11 @@ body {
   object-fit: cover;
 }
 
-/* 🔥 FULL SCREEN FLASH */
+/* 🔥 FULLY SOLID FLASH SCREEN */
 .flashScreen {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.92);
+  background: #000; /* 👈 FULL black, not transparent */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -51,11 +51,11 @@ body {
   opacity: 1;
 }
 
-/* 🔥 FIXED NO WRAP */
+/* 🔥 FLASH TEXT */
 #flashText {
   font-size: 90px;
   font-weight: 900;
-  white-space: nowrap; /* 👈 prevents 🔥 from going to next line */
+  white-space: nowrap;
   transform: scale(0.9);
   transition: transform 0.2s ease;
   text-shadow: 0 0 25px rgba(255,255,255,0.3);
@@ -116,7 +116,7 @@ button {
   <div id="flashText"></div>
 </div>
 
-<div class="card" id="card">
+<div class="card">
 
   <img id="img" src="" />
 
@@ -248,6 +248,10 @@ function showFlash(text, color) {
 
   flashScreen.classList.add("flashShow");
 
+  // 👇 LOAD NEXT IMAGE WHILE SCREEN HIDES IT
+  index++;
+  load();
+
   setTimeout(() => {
     flashScreen.classList.remove("flashShow");
   }, 1000);
@@ -274,14 +278,6 @@ function swipe(dir) {
 
     showFlash("PASS 👎", "#ff4d4d");
   }
-
-  // wait for flash screen
-  setTimeout(() => {
-
-    index++;
-    load();
-
-  }, 1000);
 }
 
 // =====================
