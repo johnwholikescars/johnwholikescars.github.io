@@ -138,7 +138,7 @@ button {
 <script>
 
 // =====================
-// IMAGE SETUP
+// IMAGES (NO REPEATS PER ROUND)
 // =====================
 let imagesBase = [
   "IMG_5076.jpeg",
@@ -156,9 +156,7 @@ let imagesBase = [
 
 let images = [];
 
-// =====================
-// SHUFFLE
-// =====================
+// shuffle
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
@@ -167,27 +165,21 @@ function shuffle(arr) {
   return arr;
 }
 
-// =====================
-// STATE
-// =====================
+// state
 let index = 0;
 let smash = 0;
 let pass = 0;
 
-// =====================
-// START ROUND (NO REPEATS)
-// =====================
+// start round
 function startRound() {
-  images = shuffle([...imagesBase]); // fresh shuffle copy
+  images = shuffle([...imagesBase]); // fresh copy + shuffle
   index = 0;
   smash = 0;
   pass = 0;
   load();
 }
 
-// =====================
-// LOAD IMAGE
-// =====================
+// load image
 function load() {
   if (index >= images.length) {
     end();
@@ -196,9 +188,7 @@ function load() {
   document.getElementById("img").src = images[index];
 }
 
-// =====================
-// END SCREEN
-// =====================
+// end screen
 function end() {
   document.querySelector(".card img").style.display = "none";
   document.querySelector(".buttons").style.display = "none";
@@ -219,9 +209,7 @@ function end() {
   `;
 }
 
-// =====================
-// RESTART (RESHUFFLE)
-// =====================
+// restart (reshuffle)
 function restart() {
   document.querySelector(".card img").style.display = "block";
   document.querySelector(".buttons").style.display = "flex";
@@ -230,9 +218,7 @@ function restart() {
   startRound();
 }
 
-// =====================
-// FLASH
-// =====================
+// flash effect
 function showFlash(text, color) {
 
   const flashScreen = document.getElementById("flashScreen");
@@ -254,9 +240,7 @@ function showFlash(text, color) {
   load();
 }
 
-// =====================
-// SWIPE
-// =====================
+// swipe logic
 function swipe(dir) {
 
   if (navigator.vibrate) navigator.vibrate(120);
@@ -270,13 +254,11 @@ function swipe(dir) {
   }
 }
 
-// =====================
-// BUTTONS
-// =====================
+// buttons
 document.getElementById("pass").onclick = () => swipe("left");
 document.getElementById("smash").onclick = () => swipe("right");
 
-// =====================
+// start
 startRound();
 
 </script>
