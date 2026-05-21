@@ -10,13 +10,18 @@ body {
   background: #0f0f0f;
   height: 100vh;
   display: flex;
-  justify-content: center;
+
+  /* 🔥 FIX: push content upward */
+  justify-content: flex-start;
   align-items: center;
+
+  padding-top: 30px;
   font-family: Arial;
   color: white;
   overflow: hidden;
 }
 
+/* CARD */
 .card {
   width: 320px;
   height: 420px;
@@ -25,6 +30,9 @@ body {
   background: #222;
   position: relative;
   touch-action: none;
+
+  /* 🔥 FIX: ensures it doesn't collide with buttons */
+  margin-bottom: 90px;
 }
 
 .card img {
@@ -51,7 +59,6 @@ body {
   opacity: 1;
 }
 
-/* TEXT */
 #flashText {
   font-size: 64px;
   font-weight: 900;
@@ -70,8 +77,12 @@ body {
 /* BUTTONS */
 .buttons {
   position: fixed;
-  bottom: 15px;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+
   display: flex;
+  justify-content: center;
   gap: 20px;
 }
 
@@ -133,7 +144,7 @@ button {
 <script>
 
 // =====================
-// IMAGE LIST (YOUR NEW SETUP)
+// IMAGES
 // =====================
 let images = [
   "IMG_5076.jpeg",
@@ -149,9 +160,7 @@ let images = [
   "IMG_5066.jpeg"
 ];
 
-// =====================
-// SHUFFLE
-// =====================
+// shuffle
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
@@ -162,7 +171,6 @@ function shuffle(arr) {
 
 images = shuffle(images);
 
-// =====================
 let index = 0;
 let smash = 0;
 let pass = 0;
@@ -174,8 +182,6 @@ const endScreen = document.getElementById("endScreen");
 const endScreenContent = document.getElementById("endScreenContent");
 
 // =====================
-// LOAD IMAGE
-// =====================
 function load() {
   if (index >= images.length) {
     end();
@@ -184,9 +190,6 @@ function load() {
   img.src = images[index];
 }
 
-// =====================
-// END SCREEN
-// =====================
 function end() {
   img.style.display = "none";
   document.querySelector(".buttons").style.display = "none";
@@ -203,9 +206,6 @@ function end() {
   `;
 }
 
-// =====================
-// RESTART
-// =====================
 function restart() {
   index = 0;
   smash = 0;
@@ -220,9 +220,6 @@ function restart() {
   load();
 }
 
-// =====================
-// FLASH EFFECT
-// =====================
 function showFlash(text, color) {
 
   flashScreen.classList.remove("flashShow");
@@ -241,11 +238,7 @@ function showFlash(text, color) {
   load();
 }
 
-// =====================
-// SWIPE
-// =====================
 function swipe(dir) {
-
   if (navigator.vibrate) navigator.vibrate(120);
 
   if (dir === "right") {
@@ -257,13 +250,9 @@ function swipe(dir) {
   }
 }
 
-// =====================
-// BUTTONS
-// =====================
 document.getElementById("pass").onclick = () => swipe("left");
 document.getElementById("smash").onclick = () => swipe("right");
 
-// =====================
 load();
 
 </script>
