@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -25,7 +24,7 @@ body {
   overflow: hidden;
   background: #222;
   position: relative;
-  transition: transform 0.2s ease;
+  transition: transform 0.25s ease;
   touch-action: none;
 }
 
@@ -35,23 +34,31 @@ body {
   object-fit: cover;
 }
 
-/* swipe feedback overlays */
+/* 🔥 BIGGER + CLEARER OVERLAYS */
 .overlay {
   position: absolute;
-  top: 20px;
-  font-size: 40px;
-  font-weight: bold;
+  top: 40px;
+  font-size: 60px;
+  font-weight: 900;
   opacity: 0;
   transition: opacity 0.2s ease;
+  text-shadow: 0 0 15px rgba(0,0,0,0.8);
 }
 
-.like { left: 20px; color: #4dff88; }
-.nope { right: 20px; color: #ff4d4d; }
+.like {
+  left: 20px;
+  color: #4dff88;
+}
 
-/* buttons */
+.nope {
+  right: 20px;
+  color: #ff4d4d;
+}
+
+/* buttons lower */
 .buttons {
   position: fixed;
-  bottom: 10px;
+  bottom: 15px;
   display: flex;
   gap: 20px;
 }
@@ -67,11 +74,34 @@ button {
 #pass { background: #ff4d4d; color: white; }
 #smash { background: #4dff88; color: black; }
 
-/* end screen */
+/* 📊 FIXED END SCREEN CENTERING */
 #endScreen {
   position: absolute;
-  text-align: center;
+  inset: 0;
   display: none;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+#endScreenContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* smoother swipe exit */
+.swipe-right {
+  transform: translateX(520px) rotate(25deg);
+  opacity: 0;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.swipe-left {
+  transform: translateX(-520px) rotate(-25deg);
+  opacity: 0;
+  transition: transform 0.4s ease, opacity 0.4s ease;
 }
 </style>
 </head>
@@ -79,12 +109,16 @@ button {
 <body>
 
 <div class="card" id="card">
+
   <div class="overlay like" id="likeText">SMASH 🔥</div>
   <div class="overlay nope" id="nopeText">PASS 👎</div>
 
   <img id="img" src="" />
 
-  <div id="endScreen"></div>
+  <div id="endScreen">
+    <div id="endScreenContent"></div>
+  </div>
+
 </div>
 
 <div class="buttons">
@@ -94,16 +128,15 @@ button {
 
 <script>
 
-// =======================
-// IMAGES (GITHUB ROOT)
-// =======================
+// =====================
+// IMAGES (ROOT)
+// =====================
 let images = [];
 
 for (let i = 5076; i >= 5066; i--) {
   images.push(`IMG_${i}.jpeg`);
 }
 
-// shuffle
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
@@ -114,7 +147,7 @@ function shuffle(arr) {
 
 images = shuffle(images);
 
-// =======================
+// =====================
 let index = 0;
 let smash = 0;
 let pass = 0;
@@ -124,13 +157,12 @@ const img = document.getElementById("img");
 const likeText = document.getElementById("likeText");
 const nopeText = document.getElementById("nopeText");
 const endScreen = document.getElementById("endScreen");
+const endScreenContent = document.getElementById("endScreenContent");
 
 let startX = 0;
 let currentX = 0;
 
-// =======================
-// LOAD IMAGE
-// =======================
+// =====================
 function load() {
   if (index >= images.length) {
     end();
@@ -139,25 +171,26 @@ function load() {
   img.src = images[index];
 }
 
-// =======================
-// END SCREEN
-// =======================
+// =====================
+// END SCREEN FIXED
+// =====================
 function end() {
   img.style.display = "none";
   document.querySelector(".buttons").style.display = "none";
 
-  endScreen.style.display = "block";
-  endScreen.innerHTML = `
+  endScreen.style.display = "flex";
+
+  endScreenContent.innerHTML = `
     <h2>Done!</h2>
-    <p>🔥 Smashes: ${smash}</p>
-    <p>👎 Passes: ${pass}</p>
-    <button onclick="restart()">Play Again</button>
+    <p style="font-size:20px;">🔥 Smashes: ${smash}</p>
+    <p style="font-size:20px;">👎 Passes: ${pass}</p>
+    <button onclick="restart()" style="margin-top:10px; padding:10px 15px; border:none; border-radius:10px;">
+      Play Again
+    </button>
   `;
 }
 
-// =======================
-// RESTART
-// =======================
+// =====================
 function restart() {
   index = 0;
   smash = 0;
@@ -172,58 +205,53 @@ function restart() {
   load();
 }
 
-// =======================
-// SWIPE ACTION
-// =======================
+// =====================
+// SWIPE (LONGER + CLEARER EFFECT)
+// =====================
 function swipe(dir) {
 
   if (dir === "right") {
     smash++;
-    card.style.transform = "translateX(500px) rotate(20deg)";
+    card.classList.add("swipe-right");
     likeText.style.opacity = 1;
   } else {
     pass++;
-    card.style.transform = "translateX(-500px) rotate(-20deg)";
+    card.classList.add("swipe-left");
     nopeText.style.opacity = 1;
   }
 
-  // vibration (mobile)
-  if (navigator.vibrate) navigator.vibrate(80);
-
+  // longer visible effect
   setTimeout(() => {
-    card.style.transition = "none";
-    card.style.transform = "translateX(0px) rotate(0deg)";
-    likeText.style.opacity = 0;
-    nopeText.style.opacity = 0;
-
-    index++;
-    load();
+    if (navigator.vibrate) navigator.vibrate(120);
 
     setTimeout(() => {
-      card.style.transition = "transform 0.2s ease";
-    }, 50);
+      card.classList.remove("swipe-right", "swipe-left");
+      likeText.style.opacity = 0;
+      nopeText.style.opacity = 0;
 
-  }, 250);
+      index++;
+      load();
+    }, 250);
+
+  }, 150);
 }
 
-// =======================
-// BUTTONS
-// =======================
+// buttons
 document.getElementById("pass").onclick = () => swipe("left");
 document.getElementById("smash").onclick = () => swipe("right");
 
-// =======================
-// DRAG SYSTEM (REAL FEEL)
-// =======================
-card.addEventListener("touchstart", (e) => {
+// =====================
+// DRAG SWIPE
+// =====================
+card.addEventListener("touchstart", e => {
   startX = e.touches[0].clientX;
 });
 
-card.addEventListener("touchmove", (e) => {
+card.addEventListener("touchmove", e => {
   currentX = e.touches[0].clientX;
   let diff = currentX - startX;
 
-  card.style.transform = `translateX(${diff}px) rotate(${diff / 20}deg)`;
+  card.style.transform = `translateX(${diff}px) rotate(${diff / 18}deg)`;
 
   likeText.style.opacity = diff > 50 ? 1 : 0;
   nopeText.style.opacity = diff < -50 ? 1 : 0;
@@ -241,7 +269,6 @@ card.addEventListener("touchend", () => {
   }
 });
 
-// =======================
 load();
 
 </script>
