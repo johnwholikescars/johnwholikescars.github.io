@@ -10,16 +10,28 @@ body {
   background: #0f0f0f;
   height: 100vh;
   display: flex;
+
+  /* 🔥 MOVE EVERYTHING UP */
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding-top: 40px;
+
   font-family: Arial;
   color: white;
   overflow: hidden;
 }
 
+/* optional username/title area */
+#username {
+  position: fixed;
+  top: 10px;
+  font-size: 18px;
+  opacity: 0.7;
+}
+
 .card {
   width: 320px;
-  height: 420px;
+  height: 520px; /* 🔥 taller card for better image space */
   border-radius: 20px;
   overflow: hidden;
   background: #222;
@@ -33,7 +45,7 @@ body {
   object-fit: cover;
 }
 
-/* 🔥 FLASH SCREEN */
+/* FLASH SCREEN */
 .flashScreen {
   position: fixed;
   inset: 0;
@@ -51,7 +63,6 @@ body {
   opacity: 1;
 }
 
-/* 🔥 TEXT (kept safe size) */
 #flashText {
   font-size: 64px;
   font-weight: 900;
@@ -59,12 +70,6 @@ body {
   text-align: center;
   padding: 20px;
   text-shadow: 0 0 25px rgba(255,255,255,0.3);
-  transform: scale(0.9);
-  transition: transform 0.2s ease;
-}
-
-.flashShow #flashText {
-  transform: scale(1);
 }
 
 /* buttons */
@@ -102,30 +107,24 @@ button {
   justify-content: center;
   text-align: center;
 }
-
-#endScreenContent {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 </style>
 </head>
 
 <body>
 
-<!-- 🔥 FLASH SCREEN -->
+<!-- 🔥 username display moved up -->
+<div id="username">your_username_here</div>
+
+<!-- FLASH -->
 <div class="flashScreen" id="flashScreen">
   <div id="flashText"></div>
 </div>
 
 <div class="card">
-
   <img id="img" src="" />
-
   <div id="endScreen">
     <div id="endScreenContent"></div>
   </div>
-
 </div>
 
 <div class="buttons">
@@ -135,16 +134,13 @@ button {
 
 <script>
 
-// =====================
-// IMAGES
-// =====================
+// images
 let images = [];
 
 for (let i = 5076; i >= 5066; i--) {
   images.push(`IMG_${i}.jpeg`);
 }
 
-// shuffle
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
@@ -155,90 +151,19 @@ function shuffle(arr) {
 
 images = shuffle(images);
 
-// =====================
 let index = 0;
 let smash = 0;
 let pass = 0;
 
 const img = document.getElementById("img");
-
 const flashScreen = document.getElementById("flashScreen");
 const flashText = document.getElementById("flashText");
 
-const endScreen = document.getElementById("endScreen");
-const endScreenContent = document.getElementById("endScreenContent");
-
-let startX = 0;
-let currentX = 0;
-
-// =====================
-// LOAD IMAGE
-// =====================
 function load() {
-
-  if (index >= images.length) {
-    end();
-    return;
-  }
-
+  if (index >= images.length) return;
   img.src = images[index];
 }
 
-// =====================
-// END SCREEN
-// =====================
-function end() {
-
-  img.style.display = "none";
-  document.querySelector(".buttons").style.display = "none";
-
-  endScreen.style.display = "flex";
-
-  endScreenContent.innerHTML = `
-    <h2>Done!</h2>
-
-    <p style="font-size:20px;">
-      🔥 Smashes: ${smash}
-    </p>
-
-    <p style="font-size:20px;">
-      👎 Passes: ${pass}
-    </p>
-
-    <button onclick="restart()"
-      style="
-      margin-top:10px;
-      padding:10px 15px;
-      border:none;
-      border-radius:10px;
-      cursor:pointer;
-    ">
-      Play Again
-    </button>
-  `;
-}
-
-// =====================
-// RESTART
-// =====================
-function restart() {
-
-  index = 0;
-  smash = 0;
-  pass = 0;
-
-  images = shuffle(images);
-
-  img.style.display = "block";
-  document.querySelector(".buttons").style.display = "flex";
-  endScreen.style.display = "none";
-
-  load();
-}
-
-// =====================
-// FLASH EFFECT (SHORTER TIME)
-// =====================
 function showFlash(text, color) {
 
   flashScreen.classList.remove("flashShow");
@@ -249,7 +174,6 @@ function showFlash(text, color) {
 
   flashScreen.classList.add("flashShow");
 
-  // 👇 reduced from 1000ms to 700ms
   setTimeout(() => {
     flashScreen.classList.remove("flashShow");
   }, 700);
@@ -258,56 +182,21 @@ function showFlash(text, color) {
   load();
 }
 
-// =====================
-// SWIPE
-// =====================
 function swipe(dir) {
-
-  if (navigator.vibrate) {
-    navigator.vibrate(120);
-  }
+  if (navigator.vibrate) navigator.vibrate(120);
 
   if (dir === "right") {
-
     smash++;
     showFlash("SMASH 🔥", "#4dff88");
-
   } else {
-
     pass++;
     showFlash("PASS 👎", "#ff4d4d");
   }
 }
 
-// =====================
-// BUTTONS
-// =====================
 document.getElementById("pass").onclick = () => swipe("left");
 document.getElementById("smash").onclick = () => swipe("right");
 
-// =====================
-// TOUCH SWIPE
-// =====================
-document.querySelector(".card").addEventListener("touchstart", e => {
-  startX = e.touches[0].clientX;
-});
-
-document.querySelector(".card").addEventListener("touchend", e => {
-
-  currentX = e.changedTouches[0].clientX;
-
-  let diff = currentX - startX;
-
-  if (diff > 100) {
-    swipe("right");
-  }
-
-  else if (diff < -100) {
-    swipe("left");
-  }
-});
-
-// =====================
 load();
 
 </script>
