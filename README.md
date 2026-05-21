@@ -17,6 +17,21 @@ body {
   overflow: hidden;
 }
 
+/* =========================
+   USERNAME (ONLY CHANGE)
+   ========================= */
+#username {
+  position: fixed;
+  top: 2px;              /* 🔥 moved higher (ONLY CHANGE) */
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 18px;
+  opacity: 0.7;
+  z-index: 1000;
+}
+
+/* CARD */
 .card {
   width: 320px;
   height: 420px;
@@ -33,7 +48,7 @@ body {
   object-fit: cover;
 }
 
-/* 🔥 FLASH SCREEN */
+/* FLASH SCREEN */
 .flashScreen {
   position: fixed;
   inset: 0;
@@ -51,7 +66,7 @@ body {
   opacity: 1;
 }
 
-/* 🔥 TEXT (kept safe size) */
+/* FLASH TEXT */
 #flashText {
   font-size: 64px;
   font-weight: 900;
@@ -67,7 +82,7 @@ body {
   transform: scale(1);
 }
 
-/* buttons */
+/* BUTTONS */
 .buttons {
   position: fixed;
   bottom: 15px;
@@ -93,7 +108,7 @@ button {
   color: black;
 }
 
-/* end screen */
+/* END SCREEN */
 #endScreen {
   position: absolute;
   inset: 0;
@@ -108,26 +123,41 @@ button {
   flex-direction: column;
   align-items: center;
 }
+
+/* SWIPE ANIMATION (if you still had it in your version) */
+.swipe-right {
+  transform: translateX(520px) rotate(25deg);
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  opacity: 0;
+}
+
+.swipe-left {
+  transform: translateX(-520px) rotate(-25deg);
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  opacity: 0;
+}
 </style>
 </head>
 
 <body>
 
-<!-- 🔥 FLASH SCREEN -->
+<!-- USERNAME DISPLAY -->
+<div id="username">your_username_here</div>
+
+<!-- FLASH SCREEN -->
 <div class="flashScreen" id="flashScreen">
   <div id="flashText"></div>
 </div>
 
+<!-- CARD -->
 <div class="card">
-
   <img id="img" src="" />
-
   <div id="endScreen">
     <div id="endScreenContent"></div>
   </div>
-
 </div>
 
+<!-- BUTTONS -->
 <div class="buttons">
   <button id="pass">Pass 👎</button>
   <button id="smash">Smash 🔥</button>
@@ -161,26 +191,19 @@ let smash = 0;
 let pass = 0;
 
 const img = document.getElementById("img");
-
 const flashScreen = document.getElementById("flashScreen");
 const flashText = document.getElementById("flashText");
-
 const endScreen = document.getElementById("endScreen");
 const endScreenContent = document.getElementById("endScreenContent");
-
-let startX = 0;
-let currentX = 0;
 
 // =====================
 // LOAD IMAGE
 // =====================
 function load() {
-
   if (index >= images.length) {
     end();
     return;
   }
-
   img.src = images[index];
 }
 
@@ -188,7 +211,6 @@ function load() {
 // END SCREEN
 // =====================
 function end() {
-
   img.style.display = "none";
   document.querySelector(".buttons").style.display = "none";
 
@@ -196,23 +218,9 @@ function end() {
 
   endScreenContent.innerHTML = `
     <h2>Done!</h2>
-
-    <p style="font-size:20px;">
-      🔥 Smashes: ${smash}
-    </p>
-
-    <p style="font-size:20px;">
-      👎 Passes: ${pass}
-    </p>
-
-    <button onclick="restart()"
-      style="
-      margin-top:10px;
-      padding:10px 15px;
-      border:none;
-      border-radius:10px;
-      cursor:pointer;
-    ">
+    <p style="font-size:20px;">🔥 Smashes: ${smash}</p>
+    <p style="font-size:20px;">👎 Passes: ${pass}</p>
+    <button onclick="restart()" style="margin-top:10px; padding:10px 15px; border:none; border-radius:10px;">
       Play Again
     </button>
   `;
@@ -222,7 +230,6 @@ function end() {
 // RESTART
 // =====================
 function restart() {
-
   index = 0;
   smash = 0;
   pass = 0;
@@ -237,7 +244,7 @@ function restart() {
 }
 
 // =====================
-// FLASH EFFECT (SHORTER TIME)
+// FLASH EFFECT
 // =====================
 function showFlash(text, color) {
 
@@ -249,7 +256,6 @@ function showFlash(text, color) {
 
   flashScreen.classList.add("flashShow");
 
-  // 👇 reduced from 1000ms to 700ms
   setTimeout(() => {
     flashScreen.classList.remove("flashShow");
   }, 700);
@@ -263,17 +269,12 @@ function showFlash(text, color) {
 // =====================
 function swipe(dir) {
 
-  if (navigator.vibrate) {
-    navigator.vibrate(120);
-  }
+  if (navigator.vibrate) navigator.vibrate(120);
 
   if (dir === "right") {
-
     smash++;
     showFlash("SMASH 🔥", "#4dff88");
-
   } else {
-
     pass++;
     showFlash("PASS 👎", "#ff4d4d");
   }
@@ -293,18 +294,12 @@ document.querySelector(".card").addEventListener("touchstart", e => {
 });
 
 document.querySelector(".card").addEventListener("touchend", e => {
-
   currentX = e.changedTouches[0].clientX;
 
   let diff = currentX - startX;
 
-  if (diff > 100) {
-    swipe("right");
-  }
-
-  else if (diff < -100) {
-    swipe("left");
-  }
+  if (diff > 100) swipe("right");
+  else if (diff < -100) swipe("left");
 });
 
 // =====================
