@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -9,17 +8,21 @@
 body {
   margin: 0;
   background: #0f0f0f;
-  height: 100vh;
-  display: flex;
-
-  /* 🔥 MOVED HIGHER */
-  justify-content: flex-start;
-  align-items: center;
-
-  padding-top: 10px; /* was 30px → moved up more */
   font-family: Arial;
   color: white;
   overflow: hidden;
+
+  /* 🔥 IMPORTANT FIX: no more centering */
+}
+
+/* container to control layout */
+#app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  /* 🔥 THIS moves everything UP */
+  padding-top: 10px;
 }
 
 /* CARD */
@@ -32,8 +35,8 @@ body {
   position: relative;
   touch-action: none;
 
-  /* keeps separation from buttons */
-  margin-bottom: 110px;
+  /* 🔥 push it higher visually */
+  margin-top: 10px;
 }
 
 .card img {
@@ -125,16 +128,20 @@ button {
 
 <body>
 
-<div class="flashScreen" id="flashScreen">
-  <div id="flashText"></div>
-</div>
+<div id="app">
 
-<div class="card">
-  <img id="img" src="" />
-
-  <div id="endScreen">
-    <div id="endScreenContent"></div>
+  <div class="flashScreen" id="flashScreen">
+    <div id="flashText"></div>
   </div>
+
+  <div class="card">
+    <img id="img" src="" />
+
+    <div id="endScreen">
+      <div id="endScreenContent"></div>
+    </div>
+  </div>
+
 </div>
 
 <div class="buttons">
@@ -144,9 +151,7 @@ button {
 
 <script>
 
-// =====================
-// IMAGES
-// =====================
+// images
 let images = [
   "IMG_5076.jpeg",
   "IMG_5075.jpeg",
