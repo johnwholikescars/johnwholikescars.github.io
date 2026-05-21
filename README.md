@@ -24,7 +24,6 @@ body {
   overflow: hidden;
   background: #222;
   position: relative;
-  transition: transform 0.25s ease;
   touch-action: none;
 }
 
@@ -34,7 +33,7 @@ body {
   object-fit: cover;
 }
 
-/* 🔥 FULL SCREEN EFFECT */
+/* 🔥 FULL SCREEN FLASH */
 .flashScreen {
   position: fixed;
   inset: 0;
@@ -42,22 +41,24 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 90px;
-  font-weight: 900;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease;
   z-index: 999;
-  text-shadow: 0 0 25px rgba(255,255,255,0.3);
 }
 
 .flashShow {
   opacity: 1;
 }
 
+/* 🔥 FIXED NO WRAP */
 #flashText {
+  font-size: 90px;
+  font-weight: 900;
+  white-space: nowrap; /* 👈 prevents 🔥 from going to next line */
   transform: scale(0.9);
   transition: transform 0.2s ease;
+  text-shadow: 0 0 25px rgba(255,255,255,0.3);
 }
 
 .flashShow #flashText {
@@ -157,7 +158,6 @@ let index = 0;
 let smash = 0;
 let pass = 0;
 
-const card = document.getElementById("card");
 const img = document.getElementById("img");
 
 const flashScreen = document.getElementById("flashScreen");
@@ -239,6 +239,10 @@ function restart() {
 // =====================
 function showFlash(text, color) {
 
+  // reset animation
+  flashScreen.classList.remove("flashShow");
+  void flashScreen.offsetWidth;
+
   flashText.innerText = text;
   flashText.style.color = color;
 
@@ -254,7 +258,9 @@ function showFlash(text, color) {
 // =====================
 function swipe(dir) {
 
-  if (navigator.vibrate) navigator.vibrate(120);
+  if (navigator.vibrate) {
+    navigator.vibrate(120);
+  }
 
   if (dir === "right") {
 
@@ -269,7 +275,7 @@ function swipe(dir) {
     showFlash("PASS 👎", "#ff4d4d");
   }
 
-  // wait while flash screen is visible
+  // wait for flash screen
   setTimeout(() => {
 
     index++;
@@ -288,11 +294,11 @@ document.getElementById("smash").onclick = () => swipe("right");
 // =====================
 // TOUCH SWIPE
 // =====================
-card.addEventListener("touchstart", e => {
+document.querySelector(".card").addEventListener("touchstart", e => {
   startX = e.touches[0].clientX;
 });
 
-card.addEventListener("touchend", e => {
+document.querySelector(".card").addEventListener("touchend", e => {
 
   currentX = e.changedTouches[0].clientX;
 
