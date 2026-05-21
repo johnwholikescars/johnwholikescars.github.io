@@ -33,11 +33,11 @@ body {
   object-fit: cover;
 }
 
-/* 🔥 FULLY SOLID FLASH SCREEN */
+/* 🔥 FULL SCREEN FLASH */
 .flashScreen {
   position: fixed;
   inset: 0;
-  background: #000; /* 👈 FULL black, not transparent */
+  background: #000;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -51,14 +51,17 @@ body {
   opacity: 1;
 }
 
-/* 🔥 FLASH TEXT */
+/* 🔥 SMALLER TEXT FIX */
 #flashText {
-  font-size: 90px;
+  font-size: 64px; /* 👈 smaller so it stays on screen */
   font-weight: 900;
   white-space: nowrap;
   transform: scale(0.9);
   transition: transform 0.2s ease;
   text-shadow: 0 0 25px rgba(255,255,255,0.3);
+  text-align: center;
+  padding: 20px;
+  max-width: 90vw;
 }
 
 .flashShow #flashText {
@@ -248,7 +251,7 @@ function showFlash(text, color) {
 
   flashScreen.classList.add("flashShow");
 
-  // 👇 LOAD NEXT IMAGE WHILE SCREEN HIDES IT
+  // load next image while hidden
   index++;
   load();
 
