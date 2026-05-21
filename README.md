@@ -45,9 +45,10 @@ body {
   opacity: 0;
 }
 
+/* ⬇️ moved buttons lower */
 .buttons {
   position: fixed;
-  bottom: 40px;
+  bottom: 15px;
   display: flex;
   gap: 20px;
 }
@@ -62,6 +63,13 @@ button {
 
 #pass { background: #ff4d4d; color: white; }
 #smash { background: #4dff88; color: black; }
+
+/* 📊 end screen */
+#endScreen {
+  position: absolute;
+  text-align: center;
+  display: none;
+}
 </style>
 </head>
 
@@ -69,6 +77,7 @@ button {
 
 <div class="card" id="card">
   <img id="img" src="" />
+  <div id="endScreen"></div>
 </div>
 
 <div class="buttons">
@@ -78,7 +87,7 @@ button {
 
 <script>
 
-// 🔥 YOUR IMAGES (ROOT LEVEL — NO "images/" FOLDER)
+// 🔥 IMAGES (ROOT LEVEL GITHUB PAGES)
 let images = [];
 
 for (let i = 5076; i >= 5066; i--) {
@@ -97,24 +106,55 @@ function shuffle(arr) {
 images = shuffle(images);
 
 let index = 0;
+let smashCount = 0;
+let passCount = 0;
 
 const img = document.getElementById("img");
 const card = document.getElementById("card");
+const endScreen = document.getElementById("endScreen");
 
 function load() {
   if (index >= images.length) {
-    card.innerHTML = "<h2>No more images</h2>";
+    showResults();
     return;
   }
 
-  // ✅ IMPORTANT FIX: NO "images/" PREFIX
   img.src = images[index];
+}
+
+function showResults() {
+  img.style.display = "none";
+  document.querySelector(".buttons").style.display = "none";
+
+  endScreen.style.display = "block";
+  endScreen.innerHTML = `
+    <h2>Done!</h2>
+    <p>🔥 Smashes: ${smashCount}</p>
+    <p>👎 Passes: ${passCount}</p>
+    <button onclick="restart()">Play Again</button>
+  `;
+}
+
+function restart() {
+  index = 0;
+  smashCount = 0;
+  passCount = 0;
+
+  images = shuffle(images);
+
+  img.style.display = "block";
+  document.querySelector(".buttons").style.display = "flex";
+  endScreen.style.display = "none";
+
+  load();
 }
 
 function swipe(dir) {
   if (dir === "right") {
+    smashCount++;
     card.classList.add("swipe-right");
   } else {
+    passCount++;
     card.classList.add("swipe-left");
   }
 
