@@ -33,7 +33,7 @@ body {
   object-fit: cover;
 }
 
-/* 🔥 FULL SCREEN FLASH */
+/* 🔥 FLASH SCREEN */
 .flashScreen {
   position: fixed;
   inset: 0;
@@ -51,17 +51,16 @@ body {
   opacity: 1;
 }
 
-/* 🔥 SMALLER TEXT FIX */
+/* 🔥 TEXT (kept safe size) */
 #flashText {
-  font-size: 64px; /* 👈 smaller so it stays on screen */
+  font-size: 64px;
   font-weight: 900;
   white-space: nowrap;
-  transform: scale(0.9);
-  transition: transform 0.2s ease;
-  text-shadow: 0 0 25px rgba(255,255,255,0.3);
   text-align: center;
   padding: 20px;
-  max-width: 90vw;
+  text-shadow: 0 0 25px rgba(255,255,255,0.3);
+  transform: scale(0.9);
+  transition: transform 0.2s ease;
 }
 
 .flashShow #flashText {
@@ -238,11 +237,10 @@ function restart() {
 }
 
 // =====================
-// 🔥 FLASH EFFECT
+// FLASH EFFECT (SHORTER TIME)
 // =====================
 function showFlash(text, color) {
 
-  // reset animation
   flashScreen.classList.remove("flashShow");
   void flashScreen.offsetWidth;
 
@@ -251,13 +249,13 @@ function showFlash(text, color) {
 
   flashScreen.classList.add("flashShow");
 
-  // load next image while hidden
-  index++;
-  load();
-
+  // 👇 reduced from 1000ms to 700ms
   setTimeout(() => {
     flashScreen.classList.remove("flashShow");
-  }, 1000);
+  }, 700);
+
+  index++;
+  load();
 }
 
 // =====================
@@ -272,13 +270,11 @@ function swipe(dir) {
   if (dir === "right") {
 
     smash++;
-
     showFlash("SMASH 🔥", "#4dff88");
 
   } else {
 
     pass++;
-
     showFlash("PASS 👎", "#ff4d4d");
   }
 }
@@ -287,7 +283,6 @@ function swipe(dir) {
 // BUTTONS
 // =====================
 document.getElementById("pass").onclick = () => swipe("left");
-
 document.getElementById("smash").onclick = () => swipe("right");
 
 // =====================
