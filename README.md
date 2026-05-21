@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -96,14 +95,17 @@ button {
 // IMAGE ARRAY (YOUR FILES)
 // -------------------------
 let images = [
-  "IMG_5043.jpeg",
-  "IMG_5037.jpeg",
-  "IMG_5031.jpeg",
-  "IMG_5041.jpeg",
-  "IMG_5036.jpeg",
-  "IMG_5030.jpeg",
-  "IMG_5040.jpeg",
-  "IMG_5034.jpeg"
+  "IMG_5076.jpeg",
+  "IMG_5075.jpeg",
+  "IMG_5074.jpeg",
+  "IMG_5073.jpeg",
+  "IMG_5072.jpeg",
+  "IMG_5071.jpeg",
+  "IMG_5070.jpeg",
+  "IMG_5069.jpeg",
+  "IMG_5068.jpeg",
+  "IMG_5067.jpeg",
+  "IMG_5066.jpeg",
 ];
 
 // -------------------------
