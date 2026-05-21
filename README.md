@@ -10,18 +10,13 @@ body {
   background: #0f0f0f;
   height: 100vh;
   display: flex;
-
-  /* 🔥 slightly higher placement for whole app */
   justify-content: center;
-  align-items: flex-start;
-  padding-top: 25px;
-
+  align-items: center;
   font-family: Arial;
   color: white;
   overflow: hidden;
 }
 
-/* CARD */
 .card {
   width: 320px;
   height: 420px;
@@ -56,7 +51,7 @@ body {
   opacity: 1;
 }
 
-/* FLASH TEXT */
+/* TEXT */
 #flashText {
   font-size: 64px;
   font-weight: 900;
@@ -138,7 +133,7 @@ button {
 <script>
 
 // =====================
-// IMAGES
+// IMAGE LIST (YOUR NEW SETUP)
 // =====================
 let images = [
   "IMG_5076.jpeg",
@@ -153,9 +148,10 @@ let images = [
   "IMG_5067.jpeg",
   "IMG_5066.jpeg"
 ];
-}
 
-// shuffle
+// =====================
+// SHUFFLE
+// =====================
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
