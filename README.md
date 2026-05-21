@@ -97,13 +97,13 @@ button {
 // -------------------------
 let images = [
   "IMG_5043.jpeg",
-  "IMG_37.jpeg",
-  "IMG_31.jpeg",
-  "IMG_41.jpeg",
-  "IMG_36.jpeg",
-  "IMG_30.jpeg",
-  "IMG_40.jpeg",
-  "IMG_34.jpeg"
+  "IMG_5037.jpeg",
+  "IMG_5031.jpeg",
+  "IMG_5041.jpeg",
+  "IMG_5036.jpeg",
+  "IMG_5030.jpeg",
+  "IMG_5040.jpeg",
+  "IMG_5034.jpeg"
 ];
 
 // -------------------------
