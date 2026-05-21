@@ -140,10 +140,19 @@ button {
 // =====================
 // IMAGES
 // =====================
-let images = [];
-
-for (let i = 5076; i >= 5066; i--) {
-  images.push(`IMG_${i}.jpeg`);
+let images = [
+  "IMG_5076.jpeg",
+  "IMG_5075.jpeg",
+  "IMG_5074.jpeg",
+  "IMG_5073.jpeg",
+  "IMG_5072.jpeg",
+  "IMG_5071.jpeg",
+  "IMG_5070.jpeg",
+  "IMG_5069.jpeg",
+  "IMG_5068.jpeg",
+  "IMG_5067.jpeg",
+  "IMG_5066.jpeg",
+];
 }
 
 // shuffle
