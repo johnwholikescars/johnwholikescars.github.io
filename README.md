@@ -105,7 +105,7 @@ let images = [
   "IMG_5069.jpeg",
   "IMG_5068.jpeg",
   "IMG_5067.jpeg",
-  "IMG_5066.jpeg",
+  "IMG_5066.jpeg"
 ];
 
 // -------------------------
