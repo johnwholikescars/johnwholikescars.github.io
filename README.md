@@ -34,7 +34,7 @@ body {
   object-fit: cover;
 }
 
-/* 🔥 BIGGER + CLEARER OVERLAYS */
+/* 🔥 BIG OVERLAY TEXT */
 .overlay {
   position: absolute;
   top: 40px;
@@ -74,7 +74,7 @@ button {
 #pass { background: #ff4d4d; color: white; }
 #smash { background: #4dff88; color: black; }
 
-/* 📊 FIXED END SCREEN CENTERING */
+/* end screen fixed centering */
 #endScreen {
   position: absolute;
   inset: 0;
@@ -91,17 +91,17 @@ button {
   justify-content: center;
 }
 
-/* smoother swipe exit */
+/* swipe animation */
 .swipe-right {
   transform: translateX(520px) rotate(25deg);
-  opacity: 0;
   transition: transform 0.4s ease, opacity 0.4s ease;
+  opacity: 0;
 }
 
 .swipe-left {
   transform: translateX(-520px) rotate(-25deg);
-  opacity: 0;
   transition: transform 0.4s ease, opacity 0.4s ease;
+  opacity: 0;
 }
 </style>
 </head>
@@ -129,7 +129,7 @@ button {
 <script>
 
 // =====================
-// IMAGES (ROOT)
+// IMAGES (ROOT GITHUB PAGES)
 // =====================
 let images = [];
 
@@ -137,6 +137,7 @@ for (let i = 5076; i >= 5066; i--) {
   images.push(`IMG_${i}.jpeg`);
 }
 
+// shuffle
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
@@ -172,8 +173,6 @@ function load() {
 }
 
 // =====================
-// END SCREEN FIXED
-// =====================
 function end() {
   img.style.display = "none";
   document.querySelector(".buttons").style.display = "none";
@@ -206,37 +205,42 @@ function restart() {
 }
 
 // =====================
-// SWIPE (LONGER + CLEARER EFFECT)
+// 🔥 FIXED LONGER EFFECT SWIPE
 // =====================
 function swipe(dir) {
 
   if (dir === "right") {
     smash++;
-    card.classList.add("swipe-right");
     likeText.style.opacity = 1;
+    card.classList.add("swipe-right");
   } else {
     pass++;
-    card.classList.add("swipe-left");
     nopeText.style.opacity = 1;
+    card.classList.add("swipe-left");
   }
 
-  // longer visible effect
+  // ⏱ LONGER VISIBILITY
   setTimeout(() => {
-    if (navigator.vibrate) navigator.vibrate(120);
+
+    if (navigator.vibrate) navigator.vibrate(150);
 
     setTimeout(() => {
+
       card.classList.remove("swipe-right", "swipe-left");
       likeText.style.opacity = 0;
       nopeText.style.opacity = 0;
 
       index++;
       load();
-    }, 250);
 
-  }, 150);
+    }, 500); // 👈 longer delay so you SEE effect
+
+  }, 300);
 }
 
-// buttons
+// =====================
+// BUTTONS
+// =====================
 document.getElementById("pass").onclick = () => swipe("left");
 document.getElementById("smash").onclick = () => swipe("right");
 
