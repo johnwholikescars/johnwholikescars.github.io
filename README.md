@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -11,11 +12,11 @@ body {
   height: 100vh;
   display: flex;
 
-  /* 🔥 FIX: push content upward */
+  /* 🔥 MOVED HIGHER */
   justify-content: flex-start;
   align-items: center;
 
-  padding-top: 30px;
+  padding-top: 10px; /* was 30px → moved up more */
   font-family: Arial;
   color: white;
   overflow: hidden;
@@ -31,8 +32,8 @@ body {
   position: relative;
   touch-action: none;
 
-  /* 🔥 FIX: ensures it doesn't collide with buttons */
-  margin-bottom: 90px;
+  /* keeps separation from buttons */
+  margin-bottom: 110px;
 }
 
 .card img {
@@ -160,7 +161,6 @@ let images = [
   "IMG_5066.jpeg"
 ];
 
-// shuffle
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
@@ -181,7 +181,6 @@ const flashText = document.getElementById("flashText");
 const endScreen = document.getElementById("endScreen");
 const endScreenContent = document.getElementById("endScreenContent");
 
-// =====================
 function load() {
   if (index >= images.length) {
     end();
