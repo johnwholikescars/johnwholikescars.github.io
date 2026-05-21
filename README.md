@@ -34,27 +34,34 @@ body {
   object-fit: cover;
 }
 
-/* 🔥 OVERLAY TEXT */
-.overlay {
-  position: absolute;
-  top: 40px;
-  font-size: 60px;
+/* 🔥 FULL SCREEN EFFECT */
+.flashScreen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.92);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 90px;
   font-weight: 900;
   opacity: 0;
-  transition: opacity 0.2s ease;
-  text-shadow: 0 0 15px rgba(0,0,0,0.8);
-  z-index: 5;
   pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 999;
+  text-shadow: 0 0 25px rgba(255,255,255,0.3);
 }
 
-.like {
-  left: 20px;
-  color: #4dff88;
+.flashShow {
+  opacity: 1;
 }
 
-.nope {
-  right: 20px;
-  color: #ff4d4d;
+#flashText {
+  transform: scale(0.9);
+  transition: transform 0.2s ease;
+}
+
+.flashShow #flashText {
+  transform: scale(1);
 }
 
 /* buttons */
@@ -97,30 +104,18 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-}
-
-/* swipe animations */
-.swipe-right {
-  transform: translateX(520px) rotate(25deg);
-  opacity: 0;
-  transition: transform 0.4s ease, opacity 0.4s ease;
-}
-
-.swipe-left {
-  transform: translateX(-520px) rotate(-25deg);
-  opacity: 0;
-  transition: transform 0.4s ease, opacity 0.4s ease;
 }
 </style>
 </head>
 
 <body>
 
-<div class="card" id="card">
+<!-- 🔥 FLASH SCREEN -->
+<div class="flashScreen" id="flashScreen">
+  <div id="flashText"></div>
+</div>
 
-  <div class="overlay like" id="likeText">SMASH 🔥</div>
-  <div class="overlay nope" id="nopeText">PASS 👎</div>
+<div class="card" id="card">
 
   <img id="img" src="" />
 
@@ -164,8 +159,10 @@ let pass = 0;
 
 const card = document.getElementById("card");
 const img = document.getElementById("img");
-const likeText = document.getElementById("likeText");
-const nopeText = document.getElementById("nopeText");
+
+const flashScreen = document.getElementById("flashScreen");
+const flashText = document.getElementById("flashText");
+
 const endScreen = document.getElementById("endScreen");
 const endScreenContent = document.getElementById("endScreenContent");
 
@@ -197,8 +194,14 @@ function end() {
 
   endScreenContent.innerHTML = `
     <h2>Done!</h2>
-    <p style="font-size:20px;">🔥 Smashes: ${smash}</p>
-    <p style="font-size:20px;">👎 Passes: ${pass}</p>
+
+    <p style="font-size:20px;">
+      🔥 Smashes: ${smash}
+    </p>
+
+    <p style="font-size:20px;">
+      👎 Passes: ${pass}
+    </p>
 
     <button onclick="restart()"
       style="
@@ -232,103 +235,75 @@ function restart() {
 }
 
 // =====================
-// 🔥 FIXED SWIPE FUNCTION
+// 🔥 FLASH EFFECT
+// =====================
+function showFlash(text, color) {
+
+  flashText.innerText = text;
+  flashText.style.color = color;
+
+  flashScreen.classList.add("flashShow");
+
+  setTimeout(() => {
+    flashScreen.classList.remove("flashShow");
+  }, 1000);
+}
+
+// =====================
+// SWIPE
 // =====================
 function swipe(dir) {
 
-  // show overlay FIRST
+  if (navigator.vibrate) navigator.vibrate(120);
+
   if (dir === "right") {
+
     smash++;
-    likeText.style.opacity = 1;
+
+    showFlash("SMASH 🔥", "#4dff88");
+
   } else {
+
     pass++;
-    nopeText.style.opacity = 1;
+
+    showFlash("PASS 👎", "#ff4d4d");
   }
 
-  // vibration
-  if (navigator.vibrate) navigator.vibrate(150);
-
-  // pause so user sees overlay
+  // wait while flash screen is visible
   setTimeout(() => {
 
-    // move card AFTER overlay appears
-    if (dir === "right") {
-      card.classList.add("swipe-right");
-    } else {
-      card.classList.add("swipe-left");
-    }
-
-    // prepare next image
     index++;
+    load();
 
-    setTimeout(() => {
-
-      // reset instantly
-      card.classList.remove("swipe-right", "swipe-left");
-
-      card.style.transition = "none";
-      card.style.transform = "translateX(0px) rotate(0deg)";
-
-      // hide overlays
-      likeText.style.opacity = 0;
-      nopeText.style.opacity = 0;
-
-      // load next image immediately
-      load();
-
-      // restore transitions
-      setTimeout(() => {
-        card.style.transition = "transform 0.25s ease";
-      }, 50);
-
-    }, 400);
-
-  }, 300);
+  }, 1000);
 }
 
 // =====================
 // BUTTONS
 // =====================
 document.getElementById("pass").onclick = () => swipe("left");
+
 document.getElementById("smash").onclick = () => swipe("right");
 
 // =====================
-// TOUCH DRAG
+// TOUCH SWIPE
 // =====================
 card.addEventListener("touchstart", e => {
   startX = e.touches[0].clientX;
 });
 
-card.addEventListener("touchmove", e => {
+card.addEventListener("touchend", e => {
 
-  currentX = e.touches[0].clientX;
-
-  let diff = currentX - startX;
-
-  card.style.transform =
-    `translateX(${diff}px) rotate(${diff / 18}deg)`;
-
-  likeText.style.opacity = diff > 50 ? 1 : 0;
-  nopeText.style.opacity = diff < -50 ? 1 : 0;
-});
-
-card.addEventListener("touchend", () => {
+  currentX = e.changedTouches[0].clientX;
 
   let diff = currentX - startX;
 
   if (diff > 100) {
     swipe("right");
   }
+
   else if (diff < -100) {
     swipe("left");
-  }
-  else {
-
-    card.style.transform =
-      "translateX(0px) rotate(0deg)";
-
-    likeText.style.opacity = 0;
-    nopeText.style.opacity = 0;
   }
 });
 
