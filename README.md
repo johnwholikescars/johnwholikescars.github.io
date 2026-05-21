@@ -1,171 +1,180 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitMatch: Smash or Pass</title>
-    <style>
-        :root {
-            --bg-color: #0d1117;
-            --card-bg: #161b22;
-            --border-color: #30363d;
-            --text-color: #c9d1d9;
-            --smash-color: #238636;
-            --pass-color: #da3633;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Smash or Pass Swipe</title>
 
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-        }
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f0f0f;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-        header {
-            margin-bottom: 20px;
-            text-align: center;
-        }
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
 
-        header h1 {
-            margin: 0;
-            font-size: 2rem;
-            color: #f0f6fc;
-        }
+.card {
+  width: 320px;
+  height: 420px;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  background: #222;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-        header p {
-            margin: 5px 0 0;
-            color: #8b949e;
-        }
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
-        .swiper-container {
-            position: relative;
-            width: 340px;
-            height: 480px;
-            perspective: 1000px;
-        }
+.swipe-right {
+  transform: translateX(450px) rotate(18deg);
+  opacity: 0;
+}
 
-        .card-stack {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
+.swipe-left {
+  transform: translateX(-450px) rotate(-18deg);
+  opacity: 0;
+}
 
-        .card {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            user-select: none;
-            cursor: grab;
-            transform-origin: center bottom;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
+.buttons {
+  display: flex;
+  gap: 15px;
+}
 
-        .card:active {
-            cursor: grabbing;
-        }
+button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+}
 
-        .card-header {
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
-            background-color: #1f242c;
-        }
+#passBtn {
+  background: #ff4d4d;
+  color: white;
+}
 
-        .repo-name {
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: #58a6ff;
-        }
+#smashBtn {
+  background: #4dff88;
+  color: black;
+}
+</style>
+</head>
 
-        .repo-lang {
-            font-size: 0.8rem;
-            color: #8b949e;
-            margin-top: 4px;
-            display: inline-block;
-            padding: 2px 8px;
-            background: #21262d;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
+<body>
 
-        .card-body {
-            padding: 16px;
-            flex-grow: 1;
-            overflow: auto;
-            font-family: ui-monospace, SFMono-Regular, SF Pro Text, Menlo, Monaco, Consolas, monospace;
-            font-size: 0.85rem;
-            background-color: #090d16;
-            color: #e6edf3;
-            white-space: pre;
-        }
+<div class="app">
+  <div class="card" id="card">
+    <img id="img" src="" />
+  </div>
 
-        /* Badge overlays for swiping feedback */
-        .badge {
-            position: absolute;
-            top: 30px;
-            padding: 10px 20px;
-            border-num: 4px solid;
-            border-radius: 8px;
-            font-size: 2rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            opacity: 0;
-            transform: rotate(-15deg);
-            pointer-events: none;
-            transition: opacity 0.1s ease;
-        }
+  <div class="buttons">
+    <button id="passBtn">👎 Pass</button>
+    <button id="smashBtn">🔥 Smash</button>
+  </div>
+</div>
 
-        .badge.smash {
-            right: 30px;
-            color: var(--smash-color);
-            border: 4px solid var(--smash-color);
-            transform: rotate(15deg);
-        }
+<script>
+// -------------------------
+// IMAGE ARRAY (YOUR FILES)
+// -------------------------
+let images = [
+  "IMG_5043.jpeg",
+  "IMG_37.jpeg",
+  "IMG_31.jpeg",
+  "IMG_41.jpeg",
+  "IMG_36.jpeg",
+  "IMG_30.jpeg",
+  "IMG_40.jpeg",
+  "IMG_34.jpeg"
+];
 
-        .badge.pass {
-            left: 30px;
-            color: var(--pass-color);
-            border: 4px solid var(--pass-color);
-            transform: rotate(-15deg);
-        }
+// -------------------------
+// SHUFFLE FUNCTION
+// -------------------------
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
 
-        .controls {
-            margin-top: 25px;
-            display: flex;
-            gap: 20px;
-        }
+images = shuffle(images);
 
-        .btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: transform 0.1s ease;
-        }
+// -------------------------
+let index = 0;
 
-        .btn:active {
-            transform: scale(0.9);
-        }
+const card = document.getElementById("card");
+const img = document.getElementById("img");
 
-        .btn-pass {
-            background-color: #21262d;
-            color: var(--pass-color);
-            border:
+// -------------------------
+function loadCard() {
+  if (index >= images.length) {
+    card.innerHTML = "<h2>No more images</h2>";
+    return;
+  }
+
+  img.src = "images/" + images[index];
+}
+
+// -------------------------
+function swipe(dir) {
+  if (dir === "right") {
+    card.classList.add("swipe-right");
+  } else {
+    card.classList.add("swipe-left");
+  }
+
+  setTimeout(() => {
+    card.classList.remove("swipe-right", "swipe-left");
+    index++;
+    loadCard();
+  }, 400);
+}
+
+// -------------------------
+// BUTTONS
+// -------------------------
+document.getElementById("passBtn").onclick = () => swipe("left");
+document.getElementById("smashBtn").onclick = () => swipe("right");
+
+// -------------------------
+// TOUCH SWIPE
+// -------------------------
+let startX = 0;
+
+card.addEventListener("touchstart", (e) => {
+  startX = e.touches[0].clientX;
+});
+
+card.addEventListener("touchend", (e) => {
+  let endX = e.changedTouches[0].clientX;
+
+  if (endX - startX > 80) swipe("right");
+  else if (startX - endX > 80) swipe("left");
+});
+
+// -------------------------
+loadCard();
+</script>
+
+</body>
+</html>
