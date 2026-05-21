@@ -10,25 +10,15 @@ body {
   background: #0f0f0f;
   height: 100vh;
   display: flex;
+
+  /* 🔥 slightly higher placement for whole app */
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding-top: 25px;
+
   font-family: Arial;
   color: white;
   overflow: hidden;
-}
-
-/* =========================
-   USERNAME (ONLY CHANGE)
-   ========================= */
-#username {
-  position: fixed;
-  top: 2px;              /* 🔥 moved higher (ONLY CHANGE) */
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-size: 18px;
-  opacity: 0.7;
-  z-index: 1000;
 }
 
 /* CARD */
@@ -123,41 +113,23 @@ button {
   flex-direction: column;
   align-items: center;
 }
-
-/* SWIPE ANIMATION (if you still had it in your version) */
-.swipe-right {
-  transform: translateX(520px) rotate(25deg);
-  transition: transform 0.4s ease, opacity 0.4s ease;
-  opacity: 0;
-}
-
-.swipe-left {
-  transform: translateX(-520px) rotate(-25deg);
-  transition: transform 0.4s ease, opacity 0.4s ease;
-  opacity: 0;
-}
 </style>
 </head>
 
 <body>
 
-<!-- USERNAME DISPLAY -->
-<div id="username">your_username_here</div>
-
-<!-- FLASH SCREEN -->
 <div class="flashScreen" id="flashScreen">
   <div id="flashText"></div>
 </div>
 
-<!-- CARD -->
 <div class="card">
   <img id="img" src="" />
+
   <div id="endScreen">
     <div id="endScreenContent"></div>
   </div>
 </div>
 
-<!-- BUTTONS -->
 <div class="buttons">
   <button id="pass">Pass 👎</button>
   <button id="smash">Smash 🔥</button>
@@ -285,22 +257,6 @@ function swipe(dir) {
 // =====================
 document.getElementById("pass").onclick = () => swipe("left");
 document.getElementById("smash").onclick = () => swipe("right");
-
-// =====================
-// TOUCH SWIPE
-// =====================
-document.querySelector(".card").addEventListener("touchstart", e => {
-  startX = e.touches[0].clientX;
-});
-
-document.querySelector(".card").addEventListener("touchend", e => {
-  currentX = e.changedTouches[0].clientX;
-
-  let diff = currentX - startX;
-
-  if (diff > 100) swipe("right");
-  else if (diff < -100) swipe("left");
-});
 
 // =====================
 load();
