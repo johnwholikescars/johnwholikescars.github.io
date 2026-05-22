@@ -21,7 +21,7 @@ body {
   padding-top: 10px;
 }
 
-/* progress counter */
+/* counter */
 #counter {
   font-size: 20px;
   margin-bottom: 10px;
@@ -37,7 +37,7 @@ body {
   background: #222;
   position: relative;
   margin-top: 10px;
-  transition: transform 0.45s ease, opacity 0.45s ease;
+  transition: transform 0.4s ease, opacity 0.4s ease;
 }
 
 .card img {
@@ -46,7 +46,7 @@ body {
   object-fit: cover;
 }
 
-/* fly animations */
+/* animations */
 .fly-right {
   transform: translateX(500px) rotate(20deg);
   opacity: 0;
@@ -57,11 +57,16 @@ body {
   opacity: 0;
 }
 
+.fly-up {
+  transform: translateY(-500px);
+  opacity: 0;
+}
+
 /* flash */
 .flashScreen {
   position: fixed;
   inset: 0;
-  background: #000;
+  background: black;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -78,10 +83,6 @@ body {
 #flashText {
   font-size: 54px;
   font-weight: 900;
-  white-space: nowrap;
-  text-align: center;
-  padding: 20px;
-  text-shadow: 0 0 25px rgba(255,255,255,0.3);
 }
 
 /* buttons */
@@ -92,26 +93,22 @@ body {
   right: 0;
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 button {
-  padding: 12px 18px;
+  padding: 12px 16px;
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
 }
 
-#pass {
-  background: #ff4d4d;
-  color: white;
-}
-
-#smash {
-  background: #4dff88;
-  color: black;
-}
+#pass { background: #ff4d4d; color: white; }
+#smash { background: #4dff88; color: black; }
+#skip { background: #4da6ff; color: white; }
+#back { background: #888; color: white; }
 
 /* end screen */
 #endScreen {
@@ -121,12 +118,8 @@ button {
   align-items: center;
   justify-content: center;
   text-align: center;
-}
-
-#endScreenContent {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  background: rgba(0,0,0,0.9);
+  z-index: 1000;
 }
 </style>
 </head>
@@ -135,7 +128,6 @@ button {
 
 <div id="app">
 
-  <!-- progress -->
   <div id="counter">1 / 1</div>
 
   <div class="flashScreen" id="flashScreen">
@@ -144,23 +136,29 @@ button {
 
   <div class="card" id="card">
     <img id="img" src="" />
-
-    <div id="endScreen">
-      <div id="endScreenContent"></div>
-    </div>
   </div>
 
 </div>
 
 <div class="buttons">
+  <button id="back">⬅ Back</button>
   <button id="pass">Pass 👎</button>
+  <button id="skip">Skip ⏭</button>
   <button id="smash">Smash 🔥</button>
+</div>
+
+<div id="endScreen">
+  <div>
+    <h1>Finished!</h1>
+    <p id="stats"></p>
+    <button onclick="restart()">Play Again</button>
+  </div>
 </div>
 
 <script>
 
 // =====================
-// IMAGES
+// ALL IMAGES
 // =====================
 let imagesBase = [
   "IMG_5076.jpeg",
@@ -206,10 +204,15 @@ let imagesBase = [
   "IMG_5151.jpeg",
   "IMG_5150.jpeg",
   "IMG_5149.jpeg"
-  
 ];
 
 let images = [];
+let skipped = [];
+let history = [];
+
+let index = 0;
+let smash = 0;
+let pass = 0;
 
 // shuffle
 function shuffle(arr) {
@@ -220,32 +223,26 @@ function shuffle(arr) {
   return arr;
 }
 
-// state
-let index = 0;
-let smash = 0;
-let pass = 0;
-
-// preload images
-function preloadImages() {
+// preload
+function preload() {
   imagesBase.forEach(src => {
     const img = new Image();
     img.src = src;
   });
 }
 
-// start round
-function startRound() {
-
+// start
+function start() {
   images = shuffle([...imagesBase]);
-
   index = 0;
   smash = 0;
   pass = 0;
-
+  skipped = [];
+  history = [];
   load();
 }
 
-// update counter
+// counter
 function updateCounter() {
   document.getElementById("counter").innerText =
     `${index + 1} / ${images.length}`;
@@ -254,126 +251,122 @@ function updateCounter() {
 // load image
 function load() {
 
+  if (index >= images.length && skipped.length > 0) {
+    images = skipped;
+    skipped = [];
+    index = 0;
+  }
+
   if (index >= images.length) {
     end();
     return;
   }
 
   document.getElementById("img").src = images[index];
-
   updateCounter();
 }
 
-// end screen
+// flash
+function flash(text, color) {
+  const f = document.getElementById("flashScreen");
+  const t = document.getElementById("flashText");
+
+  t.innerText = text;
+  t.style.color = color;
+
+  f.classList.add("flashShow");
+
+  setTimeout(() => f.classList.remove("flashShow"), 500);
+}
+
+// swipe action
+function swipe(type) {
+
+  const card = document.getElementById("card");
+
+  history.push(index);
+
+  if (type === "smash") {
+    smash++;
+    card.classList.add("fly-right");
+    flash("SMASH 🔥", "#4dff88");
+  }
+
+  if (type === "pass") {
+    pass++;
+    card.classList.add("fly-left");
+    flash("PASS 👎", "#ff4d4d");
+  }
+
+  setTimeout(() => {
+    card.classList.remove("fly-right", "fly-left");
+    index++;
+    load();
+  }, 350);
+}
+
+// skip
+function skip() {
+
+  const card = document.getElementById("card");
+
+  skipped.push(images[index]);
+  history.push(index);
+
+  card.classList.add("fly-up");
+  flash("SKIP ⏭", "#4da6ff");
+
+  setTimeout(() => {
+    card.classList.remove("fly-up");
+    index++;
+    load();
+  }, 350);
+}
+
+// back
+function back() {
+  if (history.length === 0) return;
+  index = history.pop();
+  load();
+}
+
+// end
 function end() {
 
-  document.querySelector(".card img").style.display = "none";
+  document.querySelector(".card").style.display = "none";
   document.querySelector(".buttons").style.display = "none";
   document.getElementById("counter").style.display = "none";
 
-  const endScreen = document.getElementById("endScreen");
-  const endScreenContent = document.getElementById("endScreenContent");
-
-  endScreen.style.display = "flex";
-
   const total = smash + pass;
-  const smashPercent = Math.round((smash / total) * 100);
+  const percent = total ? Math.round((smash / total) * 100) : 0;
 
-  endScreenContent.innerHTML = `
-    <h2>Done!</h2>
+  document.getElementById("endScreen").style.display = "flex";
 
-    <p style="font-size:20px;">🔥 Smashes: ${smash}</p>
-
-    <p style="font-size:20px;">👎 Passes: ${pass}</p>
-
-    <p style="font-size:18px;">
-      Smash Rate: ${smashPercent}%
-    </p>
-
-    <button onclick="restart()" 
-      style="margin-top:10px; padding:10px 15px; border:none; border-radius:10px;">
-      Play Again
-    </button>
+  document.getElementById("stats").innerHTML = `
+    🔥 Smashes: ${smash}<br>
+    👎 Passes: ${pass}<br>
+    📊 Smash Rate: ${percent}%
   `;
 }
 
 // restart
 function restart() {
-
-  document.querySelector(".card img").style.display = "block";
+  document.querySelector(".card").style.display = "block";
   document.querySelector(".buttons").style.display = "flex";
   document.getElementById("counter").style.display = "block";
-
   document.getElementById("endScreen").style.display = "none";
-
-  startRound();
-}
-
-// flash effect
-function showFlash(text, color) {
-
-  const flashScreen = document.getElementById("flashScreen");
-  const flashText = document.getElementById("flashText");
-
-  flashScreen.classList.remove("flashShow");
-  void flashScreen.offsetWidth;
-
-  flashText.innerText = text;
-  flashText.style.color = color;
-
-  flashScreen.classList.add("flashShow");
-
-  setTimeout(() => {
-    flashScreen.classList.remove("flashShow");
-  }, 600);
-}
-
-// swipe logic
-function swipe(dir) {
-
-  if (navigator.vibrate) navigator.vibrate(120);
-
-  const card = document.getElementById("card");
-
-  if (dir === "right") {
-
-    smash++;
-
-    card.classList.add("fly-right");
-
-    showFlash("SMASH 🔥", "#4dff88");
-
-  } else {
-
-    pass++;
-
-    card.classList.add("fly-left");
-
-    showFlash("PASS 👎", "#ff4d4d");
-  }
-
-  setTimeout(() => {
-
-    card.classList.remove("fly-right");
-    card.classList.remove("fly-left");
-
-    index++;
-
-    load();
-
-  }, 400);
+  start();
 }
 
 // buttons
-document.getElementById("pass").onclick = () => swipe("left");
-
-document.getElementById("smash").onclick = () => swipe("right");
-
-// preload
-preloadImages();
+document.getElementById("smash").onclick = () => swipe("smash");
+document.getElementById("pass").onclick = () => swipe("pass");
+document.getElementById("skip").onclick = skip;
+document.getElementById("back").onclick = back;
 
 // start
-startRound();
+preload();
+start();
 
 </script>
 
