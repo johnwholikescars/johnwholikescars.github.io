@@ -13,22 +13,40 @@ body {
   overflow: hidden;
 }
 
-/* layout */
+/* TOP BAR */
+.topBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  background: #111;
+  z-index: 1000;
+}
+
+#counter {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.topButtons {
+  display: flex;
+  gap: 8px;
+}
+
+/* APP */
 #app {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 10px;
+  padding-top: 80px;
 }
 
-/* counter */
-#counter {
-  font-size: 20px;
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-
-/* card */
+/* CARD */
 .card {
   width: 320px;
   height: 420px;
@@ -62,7 +80,7 @@ body {
   opacity: 0;
 }
 
-/* flash */
+/* FLASH */
 .flashScreen {
   position: fixed;
   inset: 0;
@@ -85,24 +103,25 @@ body {
   font-weight: 900;
 }
 
-/* buttons */
-.buttons {
+/* BOTTOM BAR */
+.bottomBar {
   position: fixed;
-  bottom: 20px;
+  bottom: 0;
   left: 0;
   right: 0;
+  padding: 12px;
   display: flex;
   justify-content: center;
   gap: 10px;
-  flex-wrap: wrap;
+  background: #111;
 }
 
 button {
-  padding: 12px 16px;
+  padding: 12px 14px;
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 #pass { background: #ff4d4d; color: white; }
@@ -110,25 +129,35 @@ button {
 #skip { background: #4da6ff; color: white; }
 #back { background: #888; color: white; }
 
-/* end screen */
+/* END SCREEN */
 #endScreen {
-  position: absolute;
+  position: fixed;
   inset: 0;
   display: none;
   align-items: center;
   justify-content: center;
   text-align: center;
   background: rgba(0,0,0,0.9);
-  z-index: 1000;
+  z-index: 2000;
 }
 </style>
 </head>
 
 <body>
 
-<div id="app">
+<!-- TOP BAR -->
+<div class="topBar">
 
   <div id="counter">1 / 1</div>
+
+  <div class="topButtons">
+    <button id="back">⬅</button>
+    <button id="skip">⏭</button>
+  </div>
+
+</div>
+
+<div id="app">
 
   <div class="flashScreen" id="flashScreen">
     <div id="flashText"></div>
@@ -140,13 +169,13 @@ button {
 
 </div>
 
-<div class="buttons">
-  <button id="back">⬅ Back</button>
+<!-- BOTTOM BAR -->
+<div class="bottomBar">
   <button id="pass">Pass 👎</button>
-  <button id="skip">Skip ⏭</button>
   <button id="smash">Smash 🔥</button>
 </div>
 
+<!-- END -->
 <div id="endScreen">
   <div>
     <h1>Finished!</h1>
@@ -157,53 +186,19 @@ button {
 
 <script>
 
-// =====================
-// ALL IMAGES
-// =====================
+// IMAGES (UNCHANGED)
 let imagesBase = [
-  "IMG_5076.jpeg",
-  "IMG_5075.jpeg",
-  "IMG_5074.jpeg",
-  "IMG_5073.jpeg",
-  "IMG_5072.jpeg",
-  "IMG_5071.jpeg",
-  "IMG_5070.jpeg",
-  "IMG_5069.jpeg",
-  "IMG_5068.jpeg",
-  "IMG_5067.jpeg",
-  "IMG_5066.jpeg",
-  "IMG_5083.jpeg",
-  "IMG_5098.jpeg",
-  "IMG_5097.jpeg",
-  "IMG_5115.jpeg",
-  "IMG_5116.jpeg",
-  "IMG_5118.jpeg",
-  "IMG_5117.jpeg",
-  "IMG_5119.jpeg",
-  "IMG_5122.jpeg",
-  "IMG_5120.jpeg",
-  "IMG_5121.jpeg",
-  "IMG_5125.jpeg",
-  "IMG_5124.jpeg",
-  "IMG_5123.jpeg",
-  "IMG_5128.jpeg",
-  "IMG_5127.jpeg",
-  "IMG_5126.jpeg",
-  "IMG_5163.jpeg",
-  "IMG_5162.jpeg",
-  "IMG_5161.jpeg",
-  "IMG_5160.jpeg",
-  "IMG_5159.jpeg",
-  "IMG_5158.jpeg",
-  "IMG_5157.jpeg",
-  "IMG_5156.jpeg",
-  "IMG_5155.jpeg",
-  "IMG_5154.jpeg",
-  "IMG_5153.jpeg",
-  "IMG_5152.jpeg",
-  "IMG_5151.jpeg",
-  "IMG_5150.jpeg",
-  "IMG_5149.jpeg"
+  "IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
+  "IMG_5072.jpeg","IMG_5071.jpeg","IMG_5070.jpeg","IMG_5069.jpeg",
+  "IMG_5068.jpeg","IMG_5067.jpeg","IMG_5066.jpeg","IMG_5083.jpeg",
+  "IMG_5098.jpeg","IMG_5097.jpeg","IMG_5115.jpeg","IMG_5116.jpeg",
+  "IMG_5118.jpeg","IMG_5117.jpeg","IMG_5119.jpeg","IMG_5122.jpeg",
+  "IMG_5120.jpeg","IMG_5121.jpeg","IMG_5125.jpeg","IMG_5124.jpeg",
+  "IMG_5123.jpeg","IMG_5128.jpeg","IMG_5127.jpeg","IMG_5126.jpeg",
+  "IMG_5163.jpeg","IMG_5162.jpeg","IMG_5161.jpeg","IMG_5160.jpeg",
+  "IMG_5159.jpeg","IMG_5158.jpeg","IMG_5157.jpeg","IMG_5156.jpeg",
+  "IMG_5155.jpeg","IMG_5154.jpeg","IMG_5153.jpeg","IMG_5152.jpeg",
+  "IMG_5151.jpeg","IMG_5150.jpeg","IMG_5149.jpeg"
 ];
 
 let images = [];
@@ -248,7 +243,7 @@ function updateCounter() {
     `${index + 1} / ${images.length}`;
 }
 
-// load image
+// load
 function load() {
 
   if (index >= images.length && skipped.length > 0) {
@@ -275,15 +270,13 @@ function flash(text, color) {
   t.style.color = color;
 
   f.classList.add("flashShow");
-
   setTimeout(() => f.classList.remove("flashShow"), 500);
 }
 
-// swipe action
+// swipe
 function swipe(type) {
 
   const card = document.getElementById("card");
-
   history.push(index);
 
   if (type === "smash") {
@@ -307,7 +300,6 @@ function swipe(type) {
 
 // skip
 function skip() {
-
   const card = document.getElementById("card");
 
   skipped.push(images[index]);
@@ -334,13 +326,13 @@ function back() {
 function end() {
 
   document.querySelector(".card").style.display = "none";
-  document.querySelector(".buttons").style.display = "none";
-  document.getElementById("counter").style.display = "none";
+  document.querySelector(".bottomBar").style.display = "none";
+  document.querySelector(".topBar").style.display = "none";
+
+  document.getElementById("endScreen").style.display = "flex";
 
   const total = smash + pass;
   const percent = total ? Math.round((smash / total) * 100) : 0;
-
-  document.getElementById("endScreen").style.display = "flex";
 
   document.getElementById("stats").innerHTML = `
     🔥 Smashes: ${smash}<br>
@@ -352,8 +344,8 @@ function end() {
 // restart
 function restart() {
   document.querySelector(".card").style.display = "block";
-  document.querySelector(".buttons").style.display = "flex";
-  document.getElementById("counter").style.display = "block";
+  document.querySelector(".bottomBar").style.display = "flex";
+  document.querySelector(".topBar").style.display = "flex";
   document.getElementById("endScreen").style.display = "none";
   start();
 }
