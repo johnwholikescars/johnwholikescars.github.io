@@ -21,6 +21,13 @@ body {
   padding-top: 10px;
 }
 
+/* progress counter */
+#counter {
+  font-size: 20px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
 /* card */
 .card {
   width: 320px;
@@ -30,12 +37,24 @@ body {
   background: #222;
   position: relative;
   margin-top: 10px;
+  transition: transform 0.45s ease, opacity 0.45s ease;
 }
 
 .card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* fly animations */
+.fly-right {
+  transform: translateX(500px) rotate(20deg);
+  opacity: 0;
+}
+
+.fly-left {
+  transform: translateX(-500px) rotate(-20deg);
+  opacity: 0;
 }
 
 /* flash */
@@ -57,7 +76,7 @@ body {
 }
 
 #flashText {
-  font-size: 64px;
+  font-size: 54px;
   font-weight: 900;
   white-space: nowrap;
   text-align: center;
@@ -116,11 +135,14 @@ button {
 
 <div id="app">
 
+  <!-- progress -->
+  <div id="counter">1 / 1</div>
+
   <div class="flashScreen" id="flashScreen">
     <div id="flashText"></div>
   </div>
 
-  <div class="card">
+  <div class="card" id="card">
     <img id="img" src="" />
 
     <div id="endScreen">
@@ -138,7 +160,7 @@ button {
 <script>
 
 // =====================
-// IMAGES (NO REPEATS PER ROUND)
+// IMAGES
 // =====================
 let imagesBase = [
   "IMG_5076.jpeg",
@@ -187,38 +209,71 @@ let index = 0;
 let smash = 0;
 let pass = 0;
 
+// preload images
+function preloadImages() {
+  imagesBase.forEach(src => {
+    const img = new Image();
+    img.src = src;
+  });
+}
+
 // start round
 function startRound() {
-  images = shuffle([...imagesBase]); // fresh copy + shuffle
+
+  images = shuffle([...imagesBase]);
+
   index = 0;
   smash = 0;
   pass = 0;
+
   load();
+}
+
+// update counter
+function updateCounter() {
+  document.getElementById("counter").innerText =
+    `${index + 1} / ${images.length}`;
 }
 
 // load image
 function load() {
+
   if (index >= images.length) {
     end();
     return;
   }
+
   document.getElementById("img").src = images[index];
+
+  updateCounter();
 }
 
 // end screen
 function end() {
+
   document.querySelector(".card img").style.display = "none";
   document.querySelector(".buttons").style.display = "none";
+  document.getElementById("counter").style.display = "none";
 
   const endScreen = document.getElementById("endScreen");
   const endScreenContent = document.getElementById("endScreenContent");
 
   endScreen.style.display = "flex";
 
+  const total = smash + pass;
+  const smashPercent = Math.round((smash / total) * 100);
+
   endScreenContent.innerHTML = `
     <h2>Done!</h2>
+
     <p style="font-size:20px;">🔥 Smashes: ${smash}</p>
+
     <p style="font-size:20px;">👎 Passes: ${pass}</p>
+
+    <p style="font-size:18px;">
+      Smash Rate: ${smashPercent}%
+    </p>
+
     <button onclick="restart()" 
       style="margin-top:10px; padding:10px 15px; border:none; border-radius:10px;">
       Play Again
@@ -226,10 +281,13 @@ function end() {
   `;
 }
 
-// restart (reshuffle)
+// restart
 function restart() {
+
   document.querySelector(".card img").style.display = "block";
   document.querySelector(".buttons").style.display = "flex";
+  document.getElementById("counter").style.display = "block";
+
   document.getElementById("endScreen").style.display = "none";
 
   startRound();
@@ -251,10 +309,7 @@ function showFlash(text, color) {
 
   setTimeout(() => {
     flashScreen.classList.remove("flashShow");
-  }, 700);
-
-  index++;
-  load();
+  }, 600);
 }
 
 // swipe logic
@@ -262,18 +317,44 @@ function swipe(dir) {
 
   if (navigator.vibrate) navigator.vibrate(120);
 
+  const card = document.getElementById("card");
+
   if (dir === "right") {
+
     smash++;
+
+    card.classList.add("fly-right");
+
     showFlash("SMASH 🔥", "#4dff88");
+
   } else {
+
     pass++;
+
+    card.classList.add("fly-left");
+
     showFlash("PASS 👎", "#ff4d4d");
   }
+
+  setTimeout(() => {
+
+    card.classList.remove("fly-right");
+    card.classList.remove("fly-left");
+
+    index++;
+
+    load();
+
+  }, 400);
 }
 
 // buttons
 document.getElementById("pass").onclick = () => swipe("left");
+
 document.getElementById("smash").onclick = () => swipe("right");
+
+// preload
+preloadImages();
 
 // start
 startRound();
