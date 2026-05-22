@@ -151,7 +151,8 @@ let imagesBase = [
   "IMG_5069.jpeg",
   "IMG_5068.jpeg",
   "IMG_5067.jpeg",
-  "IMG_5066.jpeg"
+  "IMG_5066.jpeg",
+  "IMG_5083.jpeg"
 ];
 
 let images = [];
