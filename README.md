@@ -106,7 +106,6 @@ body {
   cursor: pointer;
 }
 
-/* tier colors */
 #sPlus { background: gold; color: black; }
 #s { background: #ff4d4d; color: white; }
 #a { background: #4dff88; color: black; }
@@ -117,11 +116,40 @@ body {
 #endScreen {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0,0,0,0.92);
   display: none;
   justify-content: center;
   align-items: center;
   text-align: center;
+}
+
+#endBox button {
+  margin: 5px;
+  padding: 10px;
+}
+
+/* GALLERY */
+#gallery {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+#gallery img {
+  width: 120px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+#galleryTitle {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: bold;
 }
 </style>
 </head>
@@ -137,34 +165,46 @@ body {
 <div id="counter">1 / 1</div>
 
 <div id="app">
+  <div class="flashScreen" id="flashScreen">
+    <div id="flashText"></div>
+  </div>
+
   <div class="card">
     <img id="img" src="" />
   </div>
 </div>
 
+<!-- TIERS -->
 <div id="bottomRow">
-  <button id="sPlus">S+ 🔥 (<span id="sPlusLeft">5</span>)</button>
+  <button id="sPlus">S+</button>
   <button id="s">S</button>
   <button id="a">A</button>
   <button id="b">B</button>
   <button id="c">C</button>
 </div>
 
-<div class="flashScreen" id="flashScreen">
-  <div id="flashText"></div>
-</div>
-
+<!-- END -->
 <div id="endScreen">
-  <div>
+  <div id="endBox">
     <h1>Finished</h1>
+
     <p id="stats"></p>
+
+    <button onclick="showBookmarks()">Bookmarks</button>
+    <button onclick="showSPlus()">S+ Photos</button>
     <button onclick="restart()">Restart</button>
+
+    <div id="galleryTitle"></div>
+    <div id="gallery"></div>
   </div>
 </div>
 
 <script>
 
-let imagesBase = ["IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
+/* IMAGES */
+let imagesBase = [
+  "IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
+  "IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
   "IMG_5072.jpeg","IMG_5071.jpeg","IMG_5070.jpeg","IMG_5069.jpeg",
   "IMG_5068.jpeg","IMG_5067.jpeg","IMG_5066.jpeg",
   "IMG_5083.jpeg","IMG_5098.jpeg","IMG_5097.jpeg",
@@ -403,9 +443,8 @@ let imagesBase = ["IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg
 
 let images = [];
 let index = 0;
-
-/* DATA */
 let history = [];
+
 let sPlus = [];
 let sList = [];
 let aList = [];
@@ -418,13 +457,7 @@ let skipped = [];
 let sPlusUses = 0;
 const sPlusLimit = 5;
 
-/* UPDATE S+ UI */
-function updateSPlusUI(){
-  document.getElementById("sPlusLeft").innerText =
-    (sPlusLimit - sPlusUses);
-}
-
-/* SHUFFLE */
+/* shuffle */
 function shuffle(arr){
   for(let i=arr.length-1;i>0;i--){
     let j=Math.floor(Math.random()*(i+1));
@@ -433,7 +466,7 @@ function shuffle(arr){
   return arr;
 }
 
-/* START */
+/* start */
 function start(){
   images = shuffle([...imagesBase]);
   index = 0;
@@ -448,20 +481,23 @@ function start(){
   skipped = [];
   history = [];
 
-  sPlusUses = 0;
-  updateSPlusUI();
-
   load();
 }
 
-/* COUNTER */
+/* counter */
 function updateCounter(){
   document.getElementById("counter").innerText =
     `${index+1} / ${images.length}`;
 }
 
-/* LOAD */
+/* load */
 function load(){
+  if(index >= images.length && skipped.length){
+    images = [...skipped];
+    skipped = [];
+    index = 0;
+  }
+
   if(index >= images.length){
     end();
     return;
@@ -471,19 +507,17 @@ function load(){
   updateCounter();
 }
 
-/* FLASH */
+/* flash */
 function flash(text,color){
   const f=document.getElementById("flashScreen");
   const t=document.getElementById("flashText");
-
   t.innerText=text;
   t.style.color=color;
-
   f.classList.add("flashShow");
   setTimeout(()=>f.classList.remove("flashShow"),400);
 }
 
-/* TIER PICK */
+/* tier */
 function pickTier(tier){
 
   let img = images[index];
@@ -495,10 +529,8 @@ function pickTier(tier){
       flash("LOCKED 🔒","gold");
       return;
     }
-
     sPlusUses++;
     sPlus.push(img);
-    updateSPlusUI();
     flash("S+ 🔥","gold");
   }
 
@@ -511,7 +543,7 @@ function pickTier(tier){
   load();
 }
 
-/* SKIP */
+/* skip */
 function skip(){
   skipped.push(images[index]);
   flash("SKIP","cyan");
@@ -519,7 +551,7 @@ function skip(){
   load();
 }
 
-/* BACK */
+/* back */
 function back(){
   if(!history.length) return;
   let last = history.pop();
@@ -527,8 +559,8 @@ function back(){
   load();
 }
 
-/* BOOKMARK */
-function bookmark(){
+/* bookmark */
+function toggleBookmark(){
   let img = images[index];
 
   if(bookmarks.includes(img)){
@@ -549,19 +581,38 @@ function end(){
   document.getElementById("endScreen").style.display="flex";
 
   document.getElementById("stats").innerHTML =
-  `S+: ${sPlus.length}<br>
-   S: ${sList.length}<br>
-   A: ${aList.length}<br>
-   B: ${bList.length}<br>
-   C: ${cList.length}`;
+  `
+  S+: ${sPlus.length}<br>
+  S: ${sList.length}<br>
+  A: ${aList.length}<br>
+  B: ${bList.length}<br>
+  C: ${cList.length}
+  `;
 }
 
-/* RESTART */
+/* GALLERY VIEW */
+function showBookmarks(){
+  document.getElementById("galleryTitle").innerText = "🔖 Bookmarked Photos";
+  document.getElementById("gallery").innerHTML =
+    bookmarks.length
+      ? bookmarks.map(i=>`<img src="${i}">`).join("")
+      : "No bookmarks";
+}
+
+function showSPlus(){
+  document.getElementById("galleryTitle").innerText = "🔥 S+ Photos";
+  document.getElementById("gallery").innerHTML =
+    sPlus.length
+      ? sPlus.map(i=>`<img src="${i}">`).join("")
+      : "No S+ photos";
+}
+
+/* restart */
 function restart(){
   location.reload();
 }
 
-/* BUTTONS */
+/* buttons */
 document.getElementById("sPlus").onclick=()=>pickTier("sPlus");
 document.getElementById("s").onclick=()=>pickTier("s");
 document.getElementById("a").onclick=()=>pickTier("a");
@@ -570,7 +621,7 @@ document.getElementById("c").onclick=()=>pickTier("c");
 
 document.getElementById("skip").onclick=skip;
 document.getElementById("back").onclick=back;
-document.getElementById("bookmarkBtn").onclick=bookmark;
+document.getElementById("bookmarkBtn").onclick=toggleBookmark;
 
 start();
 
