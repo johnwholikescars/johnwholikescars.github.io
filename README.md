@@ -101,7 +101,7 @@ body {
   font-weight: 900;
 }
 
-/* TIER POP SCREEN (NEW) */
+/* TIER SCREEN (REAL INTERMISSION) */
 #tierScreen {
   position: fixed;
   inset: 0;
@@ -109,11 +109,11 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 60px;
+  font-size: 70px;
   font-weight: 900;
   opacity: 0;
   pointer-events: none;
-  transition: 0.2s;
+  transition: opacity 0.2s ease;
   z-index: 10000;
 }
 
@@ -158,14 +158,6 @@ body {
   align-items: center;
   text-align: center;
 }
-
-/* VIEWER */
-#viewer img {
-  width: 250px;
-  height: 350px;
-  object-fit: cover;
-  border-radius: 12px;
-}
 </style>
 </head>
 
@@ -187,7 +179,7 @@ body {
   </div>
 </div>
 
-<!-- NEW TIER SCREEN -->
+<!-- TIER SCREEN -->
 <div id="tierScreen"></div>
 
 <!-- TIERS -->
@@ -204,24 +196,15 @@ body {
   <div>
     <h1>Finished</h1>
     <p id="stats"></p>
-
-    <button onclick="openViewer('bookmarks')">Bookmarks</button>
-    <button onclick="openViewer('splus')">S+ Photos</button>
     <button onclick="restart()">Play Again</button>
-
-    <div id="viewer" style="display:none;">
-      <img id="viewerImg"/>
-      <br><br>
-      <button onclick="nextImage()">Next ➜</button>
-      <button onclick="closeViewer()">Back</button>
-    </div>
   </div>
 </div>
 
 <script>
 
-/* IMAGES (unchanged placeholder) */
-let imagesBase = ["IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
+/* IMAGES (keep yours here) */
+let imagesBase = [
+"IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
 
 "IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
   "IMG_5072.jpeg","IMG_5071.jpeg","IMG_5070.jpeg","IMG_5069.jpeg",
@@ -457,63 +440,66 @@ let imagesBase = ["IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg
 "IMG_5379.jpeg",
 "IMG_5378.jpeg",
 "IMG_5377.jpeg",
-"IMG_5376.jpeg"];
+"IMG_5376.jpeg"
+];
 
-let images=[], index=0;
+let images = [];
+let index = 0;
 
-/* TIERS */
-let sPlus=[], sList=[], aList=[], bList=[], cList=[];
-let bookmarks=[], skipped=[], history=[];
+let sPlus = [];
+let sList = [];
+let aList = [];
+let bList = [];
+let cList = [];
 
-/* S+ LIMIT */
-let sPlusUses=0;
-const sPlusLimit=5;
+let bookmarks = [];
+let skipped = [];
+let history = [];
 
-/* VIEWER */
-let viewList=[], viewIndex=0;
+let sPlusUses = 0;
+const sPlusLimit = 5;
 
-/* SHUFFLE */
-function shuffle(a){
-  for(let i=a.length-1;i>0;i--){
+/* shuffle */
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
     let j=Math.floor(Math.random()*(i+1));
-    [a[i],a[j]]=[a[j],a[i]];
+    [arr[i],arr[j]]=[arr[j],arr[i]];
   }
-  return a;
+  return arr;
 }
 
-/* START */
+/* start */
 function start(){
   images = shuffle([...imagesBase]);
-  index=0;
+  index = 0;
 
-  sPlus=[];sList=[];aList=[];bList=[];cList=[];
-  bookmarks=[];skipped=[];history=[];
+  sPlus = [];
+  sList = [];
+  aList = [];
+  bList = [];
+  cList = [];
+  bookmarks = [];
+  skipped = [];
+  history = [];
 
-  updateSPlusButton();
   load();
 }
 
-/* COUNTER */
+/* counter */
 function updateCounter(){
   document.getElementById("counter").innerText =
     `${index+1} / ${images.length}`;
 }
 
-/* S+ BUTTON LIVE UPDATE */
-function updateSPlusButton(){
-  document.getElementById("sPlus").innerText =
-    `S+ 🔥 (${sPlusLimit - sPlusUses})`;
-}
-
-/* LOAD */
+/* load */
 function load(){
-  if(index>=images.length && skipped.length){
-    images=[...skipped];
-    skipped=[];
-    index=0;
+  if(index >= images.length && skipped.length){
+    images = [...skipped];
+    skipped = [];
+    index = 0;
   }
 
-  if(index>=images.length){
+  if(index >= images.length){
     end();
     return;
   }
@@ -522,85 +508,76 @@ function load(){
   updateCounter();
 }
 
-/* TIER SCREEN POP */
+/* TIER SCREEN (INTERMISSION FIX) */
 function showTierScreen(text){
-  const screen=document.getElementById("tierScreen");
-  screen.innerText=text;
+  const screen = document.getElementById("tierScreen");
+  screen.innerText = text;
   screen.classList.add("showTier");
 
-  setTimeout(()=>{
+  setTimeout(() => {
     screen.classList.remove("showTier");
-  },300);
+  }, 400);
 }
 
-/* FLASH */
-function flash(t,c){
-  const f=document.getElementById("flashScreen");
-  const x=document.getElementById("flashText");
-  x.innerText=t;
-  x.style.color=c;
-  f.classList.add("flashShow");
-  setTimeout(()=>f.classList.remove("flashShow"),300);
-}
-
-/* PICK TIER */
+/* PICK TIER (FIXED FLOW) */
 function pickTier(t){
 
-  let img=images[index];
+  let img = images[index];
   history.push({index,t});
+
+  let tierText = "";
 
   if(t==="sPlus"){
     if(sPlusUses>=sPlusLimit){
-      flash("LOCKED","gold");
+      showTierScreen("LOCKED");
       return;
     }
     sPlusUses++;
     sPlus.push(img);
-    updateSPlusButton();
-    showTierScreen("S+");
+    tierText = "S+";
   }
 
-  if(t==="s"){ sList.push(img); showTierScreen("S"); }
-  if(t==="a"){ aList.push(img); showTierScreen("A"); }
-  if(t==="b"){ bList.push(img); showTierScreen("B"); }
-  if(t==="c"){ cList.push(img); showTierScreen("C"); }
+  if(t==="s"){ sList.push(img); tierText="S"; }
+  if(t==="a"){ aList.push(img); tierText="A"; }
+  if(t==="b"){ bList.push(img); tierText="B"; }
+  if(t==="c"){ cList.push(img); tierText="C"; }
 
-  index++;
-  load();
+  // SHOW SCREEN FIRST
+  showTierScreen(tierText);
+
+  // THEN MOVE AFTER DELAY (THIS IS THE FIX)
+  setTimeout(() => {
+    index++;
+    load();
+  }, 450);
 }
 
-/* SKIP */
+/* skip */
 function skip(){
   skipped.push(images[index]);
   index++;
   load();
 }
 
-/* BACK */
+/* back */
 function back(){
   if(!history.length) return;
-  let last=history.pop();
-  index=last.index;
+  let last = history.pop();
+  index = last.index;
   load();
 }
 
-/* BOOKMARK */
+/* bookmark */
 function toggleBookmark(){
-  let img=images[index];
+  let img = images[index];
   if(bookmarks.includes(img)){
-    bookmarks=bookmarks.filter(i=>i!==img);
+    bookmarks = bookmarks.filter(i=>i!==img);
   } else {
     bookmarks.push(img);
   }
 }
 
-/* SKIP ALL */
-function skipAll(){
-  index=images.length-1;
-  load();
-}
-
-/* END */
+/* end */
 function end(){
   document.querySelector(".card").style.display="none";
   document.getElementById("bottomRow").style.display="none";
@@ -613,40 +590,12 @@ function end(){
   `S+: ${sPlus.length}<br>S: ${sList.length}<br>A: ${aList.length}<br>B: ${bList.length}<br>C: ${cList.length}`;
 }
 
-/* VIEWER */
-function openViewer(type){
-  viewList = type==="bookmarks"?bookmarks:sPlus;
-  viewIndex=0;
-
-  if(!viewList.length) return;
-
-  document.getElementById("viewer").style.display="block";
-  showImage();
-}
-
-function showImage(){
-  document.getElementById("viewerImg").src=viewList[viewIndex];
-}
-
-function nextImage(){
-  viewIndex++;
-  if(viewIndex>=viewList.length){
-    closeViewer();
-    return;
-  }
-  showImage();
-}
-
-function closeViewer(){
-  document.getElementById("viewer").style.display="none";
-}
-
-/* RESTART */
+/* restart */
 function restart(){
   location.reload();
 }
 
-/* BUTTONS */
+/* buttons */
 document.getElementById("sPlus").onclick=()=>pickTier("sPlus");
 document.getElementById("s").onclick=()=>pickTier("s");
 document.getElementById("a").onclick=()=>pickTier("a");
@@ -656,7 +605,6 @@ document.getElementById("c").onclick=()=>pickTier("c");
 document.getElementById("skip").onclick=skip;
 document.getElementById("back").onclick=back;
 document.getElementById("bookmarkBtn").onclick=toggleBookmark;
-document.getElementById("skipAll").onclick=skipAll;
 
 start();
 
