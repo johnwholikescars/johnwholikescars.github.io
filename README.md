@@ -222,7 +222,19 @@ let imagesBase = [
 "IMG_5256.jpeg",
 "IMG_5255.jpeg",
 "IMG_5254.jpeg",
-"IMG_5253.jpeg"
+"IMG_5253.jpeg",
+"IMG_5252.jpeg",
+"IMG_5251.jpeg",
+"IMG_5229.jpeg",
+"IMG_5228.jpeg",
+"IMG_5227.jpeg",
+"IMG_5226.jpeg",
+"IMG_5225.jpeg",
+"IMG_5224.jpeg",
+"IMG_5223.jpeg",
+"IMG_5222.jpeg",
+"IMG_5221.jpeg",
+"IMG_5220.jpeg"
 ];
 let images = [];
 let skipped = [];
