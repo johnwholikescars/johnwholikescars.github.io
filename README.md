@@ -19,6 +19,21 @@ body {
   justify-content: center;
   gap: 10px;
   margin-top: 10px;
+  position: relative;
+}
+
+/* RIGHT CORNER SKIP ALL */
+#skipAll {
+  position: absolute;
+  right: 10px;
+  top: 0;
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
 }
 
 #topRow button {
@@ -86,23 +101,7 @@ body {
   font-weight: 900;
 }
 
-/* TIER SCREEN (NEW) */
-#tierScreen {
-  position: fixed;
-  inset: 0;
-  background: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 60px;
-  font-weight: 900;
-  opacity: 0;
-  pointer-events: none;
-  transition: 0.2s;
-  z-index: 1000;
-}
-
-/* BOTTOM TIERS */
+/* TIERS */
 #bottomRow {
   position: fixed;
   bottom: 15px;
@@ -122,7 +121,6 @@ body {
   cursor: pointer;
 }
 
-/* tier colors */
 #sPlus { background: gold; color: black; }
 #s { background: #ff4d4d; color: white; }
 #a { background: #4dff88; color: black; }
@@ -153,26 +151,23 @@ body {
   <button id="back">⬅</button>
   <button id="skip">⏭</button>
   <button id="bookmarkBtn">🔖</button>
+  <button id="skipAll">Skip All ⏩</button>
 </div>
 
 <div id="counter">1 / 1</div>
 
 <div id="app">
-
   <div class="flashScreen" id="flashScreen">
     <div id="flashText"></div>
   </div>
 
-  <div id="tierScreen"></div>
-
   <div class="card">
     <img id="img" src="" />
   </div>
-
 </div>
 
 <div id="bottomRow">
-  <button id="sPlus">S+ (<span id="sPlusLeft">5</span>)</button>
+  <button id="sPlus">S+ 🔥</button>
   <button id="s">S</button>
   <button id="a">A</button>
   <button id="b">B</button>
@@ -183,8 +178,6 @@ body {
   <div id="endBox">
     <h1>Finished</h1>
     <p id="stats"></p>
-    <button onclick="showBookmarks()">Bookmarks</button>
-    <button onclick="showSPlus()">S+ Photos</button>
     <button onclick="restart()">Restart</button>
   </div>
 </div>
@@ -194,7 +187,6 @@ body {
 /* IMAGES */
 let imagesBase = [
 "IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
-
 "IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
   "IMG_5072.jpeg","IMG_5071.jpeg","IMG_5070.jpeg","IMG_5069.jpeg",
   "IMG_5068.jpeg","IMG_5067.jpeg","IMG_5066.jpeg",
@@ -442,13 +434,12 @@ let aList = [];
 let bList = [];
 let cList = [];
 
-let bookmarks = [];
-let skipped = [];
-
 let sPlusUses = 0;
 const sPlusLimit = 5;
 
-/* shuffle */
+let bookmarks = [];
+let skipped = [];
+
 function shuffle(arr){
   for(let i=arr.length-1;i>0;i--){
     let j=Math.floor(Math.random()*(i+1));
@@ -457,7 +448,6 @@ function shuffle(arr){
   return arr;
 }
 
-/* start */
 function start(){
   images = shuffle([...imagesBase]);
   index = 0;
@@ -472,36 +462,15 @@ function start(){
   skipped = [];
   history = [];
 
-  updateSPlusUI();
   load();
 }
 
-/* counter */
 function updateCounter(){
   document.getElementById("counter").innerText =
     `${index+1} / ${images.length}`;
 }
 
-/* S+ UI */
-function updateSPlusUI(){
-  document.getElementById("sPlusLeft").innerText =
-    Math.max(0, sPlusLimit - sPlusUses);
-}
-
-/* tier screen */
-function showTierScreen(text){
-  const screen = document.getElementById("tierScreen");
-  screen.innerText = text;
-  screen.style.opacity = 1;
-
-  setTimeout(()=>{
-    screen.style.opacity = 0;
-  }, 350);
-}
-
-/* load */
 function load(){
-
   if(index >= images.length && skipped.length){
     images = [...skipped];
     skipped = [];
@@ -517,43 +486,55 @@ function load(){
   updateCounter();
 }
 
-/* tier select */
-function pickTier(tier){
+function flash(text,color){
+  const f=document.getElementById("flashScreen");
+  const t=document.getElementById("flashText");
+  t.innerText=text;
+  t.style.color=color;
+  f.classList.add("flashShow");
+  setTimeout(()=>f.classList.remove("flashShow"),400);
+}
 
+function pickTier(tier){
   let img = images[index];
   history.push({index,tier});
 
-  if(tier === "sPlus"){
-    if(sPlusUses >= sPlusLimit){
-      showTierScreen("LOCKED");
+  if(tier==="sPlus"){
+    if(sPlusUses>=sPlusLimit){
+      flash("LOCKED 🔒","gold");
       return;
     }
     sPlusUses++;
     sPlus.push(img);
-    showTierScreen("S+");
-    updateSPlusUI();
+    flash(`S+ (${sPlusLimit - sPlusUses})`,"gold");
   }
 
-  if(tier === "s"){ sList.push(img); showTierScreen("S"); }
-  if(tier === "a"){ aList.push(img); showTierScreen("A"); }
-  if(tier === "b"){ bList.push(img); showTierScreen("B"); }
-  if(tier === "c"){ cList.push(img); showTierScreen("C"); }
+  if(tier==="s"){ sList.push(img); flash("S","red"); }
+  if(tier==="a"){ aList.push(img); flash("A","green"); }
+  if(tier==="b"){ bList.push(img); flash("B","blue"); }
+  if(tier==="c"){ cList.push(img); flash("C","gray"); }
 
-  setTimeout(()=>{
-    index++;
-    load();
-  }, 350);
+  next();
 }
 
-/* skip */
-function skip(){
-  skipped.push(images[index]);
-  showTierScreen("SKIP");
+function next(){
   index++;
   load();
 }
 
-/* back */
+function skip(){
+  skipped.push(images[index]);
+  flash("SKIP","cyan");
+  index++;
+  load();
+}
+
+/* NEW: skip all */
+function skipAll(){
+  index = images.length - 1;
+  load();
+}
+
 function back(){
   if(!history.length) return;
   let last = history.pop();
@@ -561,20 +542,18 @@ function back(){
   load();
 }
 
-/* bookmark */
 function toggleBookmark(){
   let img = images[index];
 
   if(bookmarks.includes(img)){
     bookmarks = bookmarks.filter(i=>i!==img);
-    showTierScreen("UNBOOK");
+    flash("UNBOOKMARKED","yellow");
   } else {
     bookmarks.push(img);
-    showTierScreen("BOOKED");
+    flash("BOOKMARKED","yellow");
   }
 }
 
-/* end */
 function end(){
   document.querySelector(".card").style.display="none";
   document.getElementById("bottomRow").style.display="none";
@@ -592,21 +571,10 @@ function end(){
   `;
 }
 
-/* views */
-function showBookmarks(){
-  alert(bookmarks.join("\n") || "No bookmarks");
-}
-
-function showSPlus(){
-  alert(sPlus.join("\n") || "No S+ photos");
-}
-
-/* restart */
 function restart(){
   location.reload();
 }
 
-/* buttons */
 document.getElementById("sPlus").onclick=()=>pickTier("sPlus");
 document.getElementById("s").onclick=()=>pickTier("s");
 document.getElementById("a").onclick=()=>pickTier("a");
@@ -616,6 +584,7 @@ document.getElementById("c").onclick=()=>pickTier("c");
 document.getElementById("skip").onclick=skip;
 document.getElementById("back").onclick=back;
 document.getElementById("bookmarkBtn").onclick=toggleBookmark;
+document.getElementById("skipAll").onclick=skipAll;
 
 start();
 
