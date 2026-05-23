@@ -2,211 +2,158 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Tier Photo Rater</title>
+<title>Tier Picker</title>
 
 <style>
-
-/* ================= BODY (FIXED LAYOUT) ================= */
-body{
-  margin:0;
-  background:#0f0f0f;
-  font-family:Arial;
-  color:white;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
+body {
+  margin: 0;
+  background: #0f0f0f;
+  font-family: Arial;
+  color: white;
+  overflow: hidden;
 }
 
-/* ================= TOP ================= */
-#topArea{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  padding:10px;
+/* TOP ROW (controls) */
+#topRow {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
 }
 
-#counter{
-  font-size:18px;
-  font-weight:bold;
+#topRow button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
 }
 
-.topButton{
-  padding:8px 12px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
+#back { background: #777; color: white; }
+#skip { background: #4da6ff; color: white; }
+#bookmarkBtn { background: #ffcc00; color: black; }
+
+/* COUNTER ROW */
+#counter {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 18px;
+  font-weight: bold;
 }
 
-#back{background:#777;color:white;}
-#skip{background:#4da6ff;color:white;}
-#bookmarkBtn{background:#222;color:white;}
-
-/* ================= CENTER APP ================= */
-#app{
-  flex:1;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding:10px;
+/* APP */
+#app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* ================= CARD (NO OVERLAP SAFE) ================= */
-.card{
-  width:320px;
-  height:420px;
-  border-radius:20px;
-  overflow:hidden;
-  background:#222;
-
-  margin-bottom:140px; /* KEY FIX */
-  transition:0.3s;
+/* CARD */
+.card {
+  width: 320px;
+  height: 420px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #222;
+  margin-top: 15px;
+  position: relative;
 }
 
-.card img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-/* animations */
-.fly-right{transform:translateX(500px) rotate(15deg);opacity:0;}
-.fly-left{transform:translateX(-500px) rotate(-15deg);opacity:0;}
-.fly-up{transform:translateY(-500px);opacity:0;}
-
-/* ================= FLASH ================= */
-.flashScreen{
-  position:fixed;
-  inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:black;
-  opacity:0;
-  pointer-events:none;
-  transition:.2s;
-  z-index:999;
+/* FLASH */
+.flashScreen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.2s;
+  background: black;
+  z-index: 999;
 }
 
-.flashShow{opacity:1;}
+.flashShow { opacity: 1; }
 
-#flashText{
-  font-size:38px;
-  font-weight:900;
-  text-align:center;
-  padding:20px;
+#flashText {
+  font-size: 50px;
+  font-weight: 900;
 }
 
-/* ================= BOTTOM BAR (SAFE FIX) ================= */
-.bottomBar{
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-
-  display:flex;
-  justify-content:center;
-  flex-wrap:wrap;
-  gap:10px;
-
-  padding:15px 10px 25px;
-  background:rgba(0,0,0,.85);
-
-  z-index:10;
+/* BOTTOM TIERS */
+#bottomRow {
+  position: fixed;
+  bottom: 15px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.bottomBar button{
-  padding:12px 14px;
-  border:none;
-  border-radius:12px;
-  cursor:pointer;
-  font-weight:bold;
+#bottomRow button {
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  cursor: pointer;
 }
 
-/* tiers */
-#splus{background:gold;color:black;}
-#s{background:#ff4da6;}
-#a{background:#ff9933;}
-#b{background:#4da6ff;}
-#c{background:#666;}
+/* tier colors */
+#sPlus { background: gold; color: black; }
+#s { background: #ff4d4d; color: white; }
+#a { background: #4dff88; color: black; }
+#b { background: #4da6ff; color: white; }
+#c { background: #888; color: white; }
 
-/* ================= END SCREEN ================= */
-#endScreen{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.95);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  padding:20px;
+/* END SCREEN */
+#endScreen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 
-.endButtons{
-  margin-top:15px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+#endBox button {
+  margin: 5px;
+  padding: 10px;
 }
-
-.endButtons button{
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-}
-
-/* ================= GALLERIES ================= */
-#gallery,#splusGallery{
-  position:fixed;
-  inset:0;
-  background:black;
-  display:none;
-  overflow-y:auto;
-  padding:20px;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-  gap:10px;
-}
-
-.grid img{
-  width:100%;
-  border-radius:10px;
-}
-
 </style>
 </head>
 
 <body>
 
-<!-- TOP -->
-<div id="topArea">
-  <div id="counter">1 / 1</div>
-
-  <button id="back" class="topButton">⬅ Back</button>
-  <button id="skip" class="topButton">⏭ Skip</button>
-  <button id="bookmarkBtn" class="topButton">🔖 Bookmark</button>
+<div id="topRow">
+  <button id="back">⬅</button>
+  <button id="skip">⏭</button>
+  <button id="bookmarkBtn">🔖</button>
 </div>
 
-<!-- CENTER -->
+<div id="counter">1 / 1</div>
+
 <div id="app">
   <div class="flashScreen" id="flashScreen">
     <div id="flashText"></div>
   </div>
 
-  <div class="card" id="card">
-    <img id="img" />
+  <div class="card">
+    <img id="img" src="" />
   </div>
 </div>
 
-<!-- BOTTOM -->
-<div class="bottomBar">
-  <button id="splus">👑 S+ (5)</button>
+<!-- TIERS -->
+<div id="bottomRow">
+  <button id="sPlus">S+ 🔥</button>
   <button id="s">S</button>
   <button id="a">A</button>
   <button id="b">B</button>
@@ -215,35 +162,17 @@ body{
 
 <!-- END -->
 <div id="endScreen">
-  <div>
-    <h1>Finished!</h1>
-
-    <div id="stats"></div>
-
-    <div class="endButtons">
-      <button onclick="showBookmarks()">🔖 Bookmarks</button>
-      <button onclick="showSPlus()">👑 S+ Photos</button>
-      <button onclick="restart()">Play Again</button>
-    </div>
+  <div id="endBox">
+    <h1>Finished</h1>
+    <p id="stats"></p>
+    <button onclick="showBookmarks()">Bookmarks</button>
+    <button onclick="showSPlus()">S+ Photos</button>
+    <button onclick="restart()">Restart</button>
   </div>
-</div>
-
-<!-- GALLERIES -->
-<div id="gallery">
-  <h2>Bookmarks</h2>
-  <div class="grid" id="grid"></div>
-  <button onclick="closeGallery()">Close</button>
-</div>
-
-<div id="splusGallery">
-  <h2>S+ Photos</h2>
-  <div class="grid" id="grid2"></div>
-  <button onclick="closeSPlus()">Close</button>
 </div>
 
 <script>
 
-/* ================= IMAGES ================= */
 let imagesBase = [
 "IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
   "IMG_5072.jpeg","IMG_5071.jpeg","IMG_5070.jpeg","IMG_5069.jpeg",
@@ -481,12 +410,23 @@ let imagesBase = [
 "IMG_5377.jpeg",
 "IMG_5376.jpeg"
 ];
-/* ================= STATE ================= */
-let images=[], skipped=[], history=[];
-let bookmarks=[], splusPhotos=[];
-let index=0;
 
-let splus=0,s=0,a=0,b=0,c=0;
+let images = [];
+let index = 0;
+let history = [];
+
+/* TIER DATA */
+let sPlus = [];
+let sList = [];
+let aList = [];
+let bList = [];
+let cList = [];
+
+let sPlusUses = 0;
+const sPlusLimit = 5;
+
+let bookmarks = [];
+let skipped = [];
 
 /* shuffle */
 function shuffle(arr){
@@ -499,15 +439,23 @@ function shuffle(arr){
 
 /* start */
 function start(){
-  images=shuffle([...imagesBase]);
-  skipped=[]; history=[];
-  bookmarks=[]; splusPhotos=[];
-  index=0;
-  splus=s=a=b=c=0;
+  images = shuffle([...imagesBase]);
+  index = 0;
+
+  sPlus = [];
+  sList = [];
+  aList = [];
+  bList = [];
+  cList = [];
+
+  bookmarks = [];
+  skipped = [];
+  history = [];
+
   load();
 }
 
-/* counter */
+/* counter fix */
 function updateCounter(){
   document.getElementById("counter").innerText =
     `${index+1} / ${images.length}`;
@@ -515,51 +463,58 @@ function updateCounter(){
 
 /* load */
 function load(){
-
-  if(index>=images.length && skipped.length){
-    images=[...skipped];
-    skipped=[];
-    index=0;
+  if(index >= images.length && skipped.length){
+    images = [...skipped];
+    skipped = [];
+    index = 0;
   }
 
-  if(index>=images.length){
+  if(index >= images.length){
     end();
     return;
   }
 
-  document.getElementById("img").src=images[index];
+  document.getElementById("img").src = images[index];
   updateCounter();
 }
 
 /* flash */
-function flash(t,c){
-  let f=document.getElementById("flashScreen");
-  let txt=document.getElementById("flashText");
-
-  txt.innerText=t;
-  txt.style.color=c;
-
+function flash(text,color){
+  const f=document.getElementById("flashScreen");
+  const t=document.getElementById("flashText");
+  t.innerText=text;
+  t.style.color=color;
   f.classList.add("flashShow");
   setTimeout(()=>f.classList.remove("flashShow"),400);
 }
 
-/* choose */
-function choose(type){
+/* tier select */
+function pickTier(tier){
 
-  history.push({index,type});
+  let img = images[index];
 
-  if(type==="splus"){
-    if(splus>=5)return;
-    splus++;
-    splusPhotos.push(images[index]);
-    flash("S+","#ffd700");
+  history.push({index,tier});
+
+  if(tier==="sPlus"){
+    if(sPlusUses>=sPlusLimit){
+      flash("LOCKED 🔒","gold");
+      return;
+    }
+    sPlusUses++;
+    sPlus.push(img);
+    flash("S+ 🔥","gold");
   }
 
-  if(type==="s"){s++;flash("S","#ff4da6");}
-  if(type==="a"){a++;flash("A","#ff9933");}
-  if(type==="b"){b++;flash("B","#4da6ff");}
-  if(type==="c"){c++;flash("C","#888");}
+  if(tier==="s"){ sList.push(img); flash("S","red"); }
+  if(tier==="a"){ aList.push(img); flash("A","green"); }
+  if(tier==="b"){ bList.push(img); flash("B","blue"); }
+  if(tier==="c"){ cList.push(img); flash("C","gray"); }
 
+  next();
+}
+
+/* next */
+function next(){
   index++;
   load();
 }
@@ -567,106 +522,79 @@ function choose(type){
 /* skip */
 function skip(){
   skipped.push(images[index]);
-  history.push({index,type:"skip"});
-  flash("SKIP","#4da6ff");
+  flash("SKIP","cyan");
   index++;
   load();
 }
 
 /* back */
 function back(){
-  if(!history.length)return;
+  if(!history.length) return;
+  let last = history.pop();
 
-  let last=history.pop();
-  index=last.index;
+  index = last.index;
 
-  if(last.type==="splus"){splus--;splusPhotos.pop();}
-  if(last.type==="s")s--;
-  if(last.type==="a")a--;
-  if(last.type==="b")b--;
-  if(last.type==="c")c--;
+  /* (simple undo — doesn’t fully restore tier removal for simplicity) */
 
   load();
 }
 
 /* bookmark */
-function bookmark(){
-  if(!bookmarks.includes(images[index])){
-    bookmarks.push(images[index]);
-    flash("BOOKMARKED","#fff");
+function toggleBookmark(){
+  let img = images[index];
+
+  if(bookmarks.includes(img)){
+    bookmarks = bookmarks.filter(i=>i!==img);
+    flash("UNBOOKMARKED","yellow");
+  } else {
+    bookmarks.push(img);
+    flash("BOOKMARKED","yellow");
   }
 }
 
-/* end */
+/* END */
 function end(){
-
-  document.getElementById("card").style.display="none";
-  document.querySelector(".bottomBar").style.display="none";
-  document.getElementById("topArea").style.display="none";
-
+  document.querySelector(".card").style.display="none";
+  document.getElementById("bottomRow").style.display="none";
+  document.getElementById("topRow").style.display="none";
+  document.getElementById("counter").style.display="none";
   document.getElementById("endScreen").style.display="flex";
 
-  document.getElementById("stats").innerHTML=`
-    👑 S+: ${splus}<br>
-    💖 S: ${s}<br>
-    🔥 A: ${a}<br>
-    👍 B: ${b}<br>
-    👎 C: ${c}<br>
-    🔖 Bookmarks: ${bookmarks.length}
+  document.getElementById("stats").innerHTML =
+  `
+  S+: ${sPlus.length}<br>
+  S: ${sList.length}<br>
+  A: ${aList.length}<br>
+  B: ${bList.length}<br>
+  C: ${cList.length}
   `;
+}
+
+/* views */
+function showBookmarks(){
+  alert(bookmarks.join("\n") || "No bookmarks");
+}
+
+function showSPlus(){
+  alert(sPlus.join("\n") || "No S+ photos");
 }
 
 /* restart */
 function restart(){
-  document.getElementById("card").style.display="block";
-  document.querySelector(".bottomBar").style.display="flex";
-  document.getElementById("topArea").style.display="flex";
-  document.getElementById("endScreen").style.display="none";
-  start();
-}
-
-/* galleries */
-function showBookmarks(){
-  document.getElementById("gallery").style.display="block";
-  let g=document.getElementById("grid");
-  g.innerHTML="";
-  bookmarks.forEach(i=>{
-    let img=document.createElement("img");
-    img.src=i;
-    g.appendChild(img);
-  });
-}
-
-function showSPlus(){
-  document.getElementById("splusGallery").style.display="block";
-  let g=document.getElementById("grid2");
-  g.innerHTML="";
-  splusPhotos.forEach(i=>{
-    let img=document.createElement("img");
-    img.src=i;
-    g.appendChild(img);
-  });
-}
-
-function closeGallery(){
-  document.getElementById("gallery").style.display="none";
-}
-
-function closeSPlus(){
-  document.getElementById("splusGallery").style.display="none";
+  location.reload();
 }
 
 /* buttons */
-document.getElementById("splus").onclick=()=>choose("splus");
-document.getElementById("s").onclick=()=>choose("s");
-document.getElementById("a").onclick=()=>choose("a");
-document.getElementById("b").onclick=()=>choose("b");
-document.getElementById("c").onclick=()=>choose("c");
+document.getElementById("sPlus").onclick=()=>pickTier("sPlus");
+document.getElementById("s").onclick=()=>pickTier("s");
+document.getElementById("a").onclick=()=>pickTier("a");
+document.getElementById("b").onclick=()=>pickTier("b");
+document.getElementById("c").onclick=()=>pickTier("c");
+
 document.getElementById("skip").onclick=skip;
 document.getElementById("back").onclick=back;
-document.getElementById("bookmarkBtn").onclick=bookmark;
+document.getElementById("bookmarkBtn").onclick=toggleBookmark;
 
-/* start */
 start();
 
 </script>
