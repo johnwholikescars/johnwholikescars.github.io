@@ -13,7 +13,7 @@ body {
   overflow: hidden;
 }
 
-/* TOP ROW */
+/* TOP */
 #topRow {
   display: flex;
   justify-content: center;
@@ -26,29 +26,24 @@ body {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 13px;
 }
 
 #back { background: #777; color: white; }
 #skip { background: #4da6ff; color: white; }
 #bookmarkBtn { background: #ffcc00; color: black; }
 
-/* COUNTER */
 #counter {
   text-align: center;
   margin-top: 8px;
-  font-size: 18px;
   font-weight: bold;
 }
 
-/* APP */
+/* CARD */
 #app {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
 }
 
-/* CARD */
 .card {
   width: 320px;
   height: 420px;
@@ -56,7 +51,6 @@ body {
   overflow: hidden;
   background: #222;
   margin-top: 15px;
-  position: relative;
 }
 
 .card img {
@@ -72,21 +66,21 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  background: black;
   opacity: 0;
   pointer-events: none;
   transition: 0.2s;
-  background: black;
   z-index: 999;
 }
 
 .flashShow { opacity: 1; }
 
 #flashText {
-  font-size: 50px;
+  font-size: 40px;
   font-weight: 900;
 }
 
-/* BOTTOM TIERS */
+/* BOTTOM */
 #bottomRow {
   position: fixed;
   bottom: 15px;
@@ -95,20 +89,19 @@ body {
   display: flex;
   justify-content: center;
   gap: 8px;
-  flex-wrap: wrap;
 }
 
 #bottomRow button {
   padding: 10px 12px;
-  border: none;
   border-radius: 10px;
-  font-size: 13px;
+  border: none;
   cursor: pointer;
 }
 
-#sPlus { background: gold; color: black; }
+/* TIERS */
+#sPlus { background: gold; }
 #s { background: #ff4d4d; color: white; }
-#a { background: #4dff88; color: black; }
+#a { background: #4dff88; }
 #b { background: #4da6ff; color: white; }
 #c { background: #888; color: white; }
 
@@ -116,40 +109,39 @@ body {
 #endScreen {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.92);
   display: none;
-  justify-content: center;
+  background: rgba(0,0,0,0.95);
   align-items: center;
+  justify-content: center;
   text-align: center;
 }
 
-#endBox button {
-  margin: 5px;
-  padding: 10px;
-}
-
-/* GALLERY */
-#gallery {
-  display: flex;
-  flex-wrap: wrap;
+#viewer {
+  position: fixed;
+  inset: 0;
+  display: none;
+  background: black;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  gap: 10px;
+}
+
+#viewer img {
+  width: 80%;
+  max-width: 400px;
+  border-radius: 15px;
+}
+
+.viewerBtns {
   margin-top: 15px;
-  max-height: 50vh;
-  overflow-y: auto;
+  display: flex;
+  gap: 10px;
 }
 
-#gallery img {
-  width: 120px;
-  height: 160px;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-#galleryTitle {
-  margin-top: 10px;
-  font-size: 18px;
-  font-weight: bold;
+.viewerBtns button {
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
 }
 </style>
 </head>
@@ -170,11 +162,10 @@ body {
   </div>
 
   <div class="card">
-    <img id="img" src="" />
+    <img id="img" />
   </div>
 </div>
 
-<!-- TIERS -->
 <div id="bottomRow">
   <button id="sPlus">S+</button>
   <button id="s">S</button>
@@ -183,28 +174,34 @@ body {
   <button id="c">C</button>
 </div>
 
-<!-- END -->
+<!-- END SCREEN -->
 <div id="endScreen">
-  <div id="endBox">
+  <div>
     <h1>Finished</h1>
-
     <p id="stats"></p>
 
-    <button onclick="showBookmarks()">Bookmarks</button>
-    <button onclick="showSPlus()">S+ Photos</button>
+    <button onclick="openViewer('bookmarks')">View Bookmarks</button>
+    <button onclick="openViewer('splus')">View S+</button>
     <button onclick="restart()">Restart</button>
+  </div>
+</div>
 
-    <div id="galleryTitle"></div>
-    <div id="gallery"></div>
+<!-- VIEWER -->
+<div id="viewer">
+  <img id="viewerImg" />
+  <div class="viewerBtns">
+    <button onclick="prevImg()">⬅</button>
+    <button onclick="closeViewer()">Close</button>
+    <button onclick="nextImg()">➡</button>
   </div>
 </div>
 
 <script>
 
-/* IMAGES */
+/* images */
 let imagesBase = [
-  "IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
-  "IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
+"IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
+"IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
   "IMG_5072.jpeg","IMG_5071.jpeg","IMG_5070.jpeg","IMG_5069.jpeg",
   "IMG_5068.jpeg","IMG_5067.jpeg","IMG_5066.jpeg",
   "IMG_5083.jpeg","IMG_5098.jpeg","IMG_5097.jpeg",
@@ -443,101 +440,59 @@ let imagesBase = [
 
 let images = [];
 let index = 0;
-let history = [];
 
-let sPlus = [];
-let sList = [];
-let aList = [];
-let bList = [];
-let cList = [];
-
+/* data */
 let bookmarks = [];
-let skipped = [];
+let sPlus = [];
 
-let sPlusUses = 0;
-const sPlusLimit = 5;
+let viewerList = [];
+let viewerIndex = 0;
 
 /* shuffle */
-function shuffle(arr){
-  for(let i=arr.length-1;i>0;i--){
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){
     let j=Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]]=[arr[j],arr[i]];
+    [a[i],a[j]]=[a[j],a[i]];
   }
-  return arr;
+  return a;
 }
 
 /* start */
 function start(){
   images = shuffle([...imagesBase]);
   index = 0;
-
-  sPlus = [];
-  sList = [];
-  aList = [];
-  bList = [];
-  cList = [];
-
-  bookmarks = [];
-  skipped = [];
-  history = [];
-
   load();
-}
-
-/* counter */
-function updateCounter(){
-  document.getElementById("counter").innerText =
-    `${index+1} / ${images.length}`;
 }
 
 /* load */
 function load(){
-  if(index >= images.length && skipped.length){
-    images = [...skipped];
-    skipped = [];
-    index = 0;
-  }
-
   if(index >= images.length){
     end();
     return;
   }
-
   document.getElementById("img").src = images[index];
-  updateCounter();
+  document.getElementById("counter").innerText =
+    `${index+1} / ${images.length}`;
 }
 
 /* flash */
-function flash(text,color){
-  const f=document.getElementById("flashScreen");
-  const t=document.getElementById("flashText");
-  t.innerText=text;
-  t.style.color=color;
+function flash(t,c){
+  let f=document.getElementById("flashScreen");
+  let tx=document.getElementById("flashText");
+  tx.innerText=t;
+  tx.style.color=c;
   f.classList.add("flashShow");
-  setTimeout(()=>f.classList.remove("flashShow"),400);
+  setTimeout(()=>f.classList.remove("flashShow"),300);
 }
 
 /* tier */
-function pickTier(tier){
-
+function tier(name){
   let img = images[index];
 
-  history.push({index,tier});
-
-  if(tier==="sPlus"){
-    if(sPlusUses>=sPlusLimit){
-      flash("LOCKED 🔒","gold");
-      return;
-    }
-    sPlusUses++;
+  if(name==="splus"){
     sPlus.push(img);
-    flash("S+ 🔥","gold");
+    flash("S+","gold");
   }
-
-  if(tier==="s"){ sList.push(img); flash("S","red"); }
-  if(tier==="a"){ aList.push(img); flash("A","green"); }
-  if(tier==="b"){ bList.push(img); flash("B","blue"); }
-  if(tier==="c"){ cList.push(img); flash("C","gray"); }
 
   index++;
   load();
@@ -545,66 +500,75 @@ function pickTier(tier){
 
 /* skip */
 function skip(){
-  skipped.push(images[index]);
-  flash("SKIP","cyan");
   index++;
   load();
 }
 
 /* back */
 function back(){
-  if(!history.length) return;
-  let last = history.pop();
-  index = last.index;
+  if(index>0) index--;
   load();
 }
 
 /* bookmark */
 function toggleBookmark(){
   let img = images[index];
-
   if(bookmarks.includes(img)){
     bookmarks = bookmarks.filter(i=>i!==img);
-    flash("UNBOOKMARKED","yellow");
   } else {
     bookmarks.push(img);
-    flash("BOOKMARKED","yellow");
   }
+  flash("Saved","yellow");
 }
 
-/* END */
+/* end */
 function end(){
   document.querySelector(".card").style.display="none";
   document.getElementById("bottomRow").style.display="none";
   document.getElementById("topRow").style.display="none";
   document.getElementById("counter").style.display="none";
+
   document.getElementById("endScreen").style.display="flex";
 
   document.getElementById("stats").innerHTML =
-  `
-  S+: ${sPlus.length}<br>
-  S: ${sList.length}<br>
-  A: ${aList.length}<br>
-  B: ${bList.length}<br>
-  C: ${cList.length}
-  `;
+    `Bookmarks: ${bookmarks.length}<br>S+: ${sPlus.length}`;
 }
 
-/* GALLERY VIEW */
-function showBookmarks(){
-  document.getElementById("galleryTitle").innerText = "🔖 Bookmarked Photos";
-  document.getElementById("gallery").innerHTML =
-    bookmarks.length
-      ? bookmarks.map(i=>`<img src="${i}">`).join("")
-      : "No bookmarks";
+/* viewer */
+function openViewer(type){
+  viewerList = type==="bookmarks" ? bookmarks : sPlus;
+  viewerIndex = 0;
+
+  if(viewerList.length===0){
+    alert("Empty");
+    return;
+  }
+
+  document.getElementById("viewer").style.display="flex";
+  showViewer();
 }
 
-function showSPlus(){
-  document.getElementById("galleryTitle").innerText = "🔥 S+ Photos";
-  document.getElementById("gallery").innerHTML =
-    sPlus.length
-      ? sPlus.map(i=>`<img src="${i}">`).join("")
-      : "No S+ photos";
+function showViewer(){
+  document.getElementById("viewerImg").src =
+    viewerList[viewerIndex];
+}
+
+function nextImg(){
+  if(viewerIndex < viewerList.length-1){
+    viewerIndex++;
+    showViewer();
+  }
+}
+
+function prevImg(){
+  if(viewerIndex > 0){
+    viewerIndex--;
+    showViewer();
+  }
+}
+
+function closeViewer(){
+  document.getElementById("viewer").style.display="none";
 }
 
 /* restart */
@@ -613,12 +577,7 @@ function restart(){
 }
 
 /* buttons */
-document.getElementById("sPlus").onclick=()=>pickTier("sPlus");
-document.getElementById("s").onclick=()=>pickTier("s");
-document.getElementById("a").onclick=()=>pickTier("a");
-document.getElementById("b").onclick=()=>pickTier("b");
-document.getElementById("c").onclick=()=>pickTier("c");
-
+document.getElementById("sPlus").onclick=()=>tier("splus");
 document.getElementById("skip").onclick=skip;
 document.getElementById("back").onclick=back;
 document.getElementById("bookmarkBtn").onclick=toggleBookmark;
