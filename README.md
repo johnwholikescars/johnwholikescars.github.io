@@ -100,6 +100,26 @@ body {
   font-weight: 900;
 }
 
+/* 🆕 TIER SCREEN (NEW) */
+#tierScreen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 60px;
+  font-weight: 900;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.2s;
+  z-index: 1000;
+}
+
+#tierScreen.show {
+  opacity: 1;
+}
+
 /* TIERS */
 #bottomRow {
   position: fixed;
@@ -144,11 +164,6 @@ body {
   border-radius: 12px;
   margin-bottom: 10px;
 }
-
-#endBox button {
-  margin: 5px;
-  padding: 10px;
-}
 </style>
 </head>
 
@@ -168,25 +183,26 @@ body {
     <div id="flashText"></div>
   </div>
 
+  <!-- 🆕 TIER SCREEN -->
+  <div id="tierScreen"></div>
+
   <div class="card">
     <img id="img" src="" />
   </div>
 </div>
 
 <div id="bottomRow">
-  <button id="sPlus">S+ 🔥</button>
+  <button id="sPlus">S+ 🔥 (5)</button>
   <button id="s">S</button>
   <button id="a">A</button>
   <button id="b">B</button>
   <button id="c">C</button>
 </div>
 
-<!-- END SCREEN -->
 <div id="endScreen">
   <div id="endBox">
 
     <h1>Finished</h1>
-
     <p id="stats"></p>
 
     <img id="viewerImg" style="display:none;" />
@@ -461,10 +477,10 @@ let skipped = [];
 let sPlusUses = 0;
 const sPlusLimit = 5;
 
-/* viewer system */
 let viewMode = null;
 let viewIndex = 0;
 
+/* shuffle */
 function shuffle(arr){
   for(let i=arr.length-1;i>0;i--){
     let j=Math.floor(Math.random()*(i+1));
@@ -487,14 +503,35 @@ function start(){
   skipped = [];
   history = [];
 
+  updateSPlusButton();
   load();
 }
 
+/* counter */
 function updateCounter(){
   document.getElementById("counter").innerText =
     `${index+1} / ${images.length}`;
 }
 
+/* S+ button text update */
+function updateSPlusButton(){
+  document.getElementById("sPlus").innerText =
+    `S+ 🔥 (${sPlusLimit - sPlusUses})`;
+}
+
+/* tier screen animation */
+function showTierScreen(text, color){
+  const screen = document.getElementById("tierScreen");
+  screen.innerText = text;
+  screen.style.color = color;
+  screen.classList.add("show");
+
+  setTimeout(() => {
+    screen.classList.remove("show");
+  }, 300);
+}
+
+/* load */
 function load(){
   if(index >= images.length && skipped.length){
     images = [...skipped];
@@ -511,6 +548,7 @@ function load(){
   updateCounter();
 }
 
+/* flash */
 function flash(text,color){
   const f=document.getElementById("flashScreen");
   const t=document.getElementById("flashText");
@@ -520,6 +558,7 @@ function flash(text,color){
   setTimeout(()=>f.classList.remove("flashShow"),400);
 }
 
+/* tier system (UPDATED WITH SCREEN) */
 function pickTier(tier){
   let img = images[index];
   history.push({index,tier});
@@ -531,14 +570,31 @@ function pickTier(tier){
     }
     sPlusUses++;
     sPlus.push(img);
+    showTierScreen("S+", "gold");
+    updateSPlusButton();
   }
 
-  if(tier==="s") sList.push(img);
-  if(tier==="a") aList.push(img);
-  if(tier==="b") bList.push(img);
-  if(tier==="c") cList.push(img);
+  if(tier==="s"){
+    sList.push(img);
+    showTierScreen("S", "red");
+  }
 
-  next();
+  if(tier==="a"){
+    aList.push(img);
+    showTierScreen("A", "green");
+  }
+
+  if(tier==="b"){
+    bList.push(img);
+    showTierScreen("B", "blue");
+  }
+
+  if(tier==="c"){
+    cList.push(img);
+    showTierScreen("C", "gray");
+  }
+
+  setTimeout(next, 250);
 }
 
 function next(){
@@ -576,7 +632,7 @@ function toggleBookmark(){
   }
 }
 
-/* END SCREEN */
+/* END */
 function end(){
   document.querySelector(".card").style.display="none";
   document.getElementById("bottomRow").style.display="none";
@@ -588,7 +644,7 @@ function end(){
   `S+: ${sPlus.length}<br>S: ${sList.length}<br>A: ${aList.length}<br>B: ${bList.length}<br>C: ${cList.length}`;
 }
 
-/* VIEWER SYSTEM */
+/* viewer system */
 function openViewer(type){
   viewMode = type;
   viewIndex = 0;
@@ -598,10 +654,7 @@ function openViewer(type){
 function showViewer(){
   let list = viewMode === "sPlus" ? sPlus : bookmarks;
 
-  if(!list.length){
-    alert("No photos in this category");
-    return;
-  }
+  if(!list.length) return;
 
   document.getElementById("viewerImg").style.display = "block";
   document.getElementById("viewerImg").src = list[viewIndex];
@@ -609,8 +662,6 @@ function showViewer(){
 
 function nextPhoto(){
   let list = viewMode === "sPlus" ? sPlus : bookmarks;
-
-  if(!list.length) return;
 
   viewIndex++;
 
@@ -630,7 +681,6 @@ function backToEnd(){
   document.getElementById("viewerImg").style.display = "none";
 }
 
-/* restart */
 function restart(){
   location.reload();
 }
