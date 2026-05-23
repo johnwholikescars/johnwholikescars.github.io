@@ -13,7 +13,7 @@ body {
   overflow: hidden;
 }
 
-/* TOP ROW */
+/* TOP ROW (controls) */
 #topRow {
   display: flex;
   justify-content: center;
@@ -33,7 +33,7 @@ body {
 #skip { background: #4da6ff; color: white; }
 #bookmarkBtn { background: #ffcc00; color: black; }
 
-/* COUNTER */
+/* COUNTER ROW */
 #counter {
   text-align: center;
   margin-top: 8px;
@@ -44,16 +44,19 @@ body {
 /* APP */
 #app {
   display: flex;
-  justify-content: center;
-  margin-top: 15px;
+  flex-direction: column;
+  align-items: center;
 }
 
+/* CARD */
 .card {
   width: 320px;
   height: 420px;
   border-radius: 20px;
   overflow: hidden;
   background: #222;
+  margin-top: 15px;
+  position: relative;
 }
 
 .card img {
@@ -71,8 +74,9 @@ body {
   align-items: center;
   opacity: 0;
   pointer-events: none;
-  background: black;
   transition: 0.2s;
+  background: black;
+  z-index: 999;
 }
 
 .flashShow { opacity: 1; }
@@ -90,36 +94,39 @@ body {
   right: 0;
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
-/* 🔥 BIGGER BUTTONS */
 #bottomRow button {
-  padding: 16px 18px;
-  font-size: 16px;
+  padding: 10px 12px;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
+  font-size: 13px;
   cursor: pointer;
-  min-width: 90px;
 }
 
-/* COLORS */
+/* tier colors */
 #sPlus { background: gold; color: black; }
 #s { background: #ff4d4d; color: white; }
 #a { background: #4dff88; color: black; }
 #b { background: #4da6ff; color: white; }
 #c { background: #888; color: white; }
 
-/* END */
+/* END SCREEN */
 #endScreen {
   position: fixed;
   inset: 0;
-  display: none;
   background: rgba(0,0,0,0.9);
+  display: none;
   justify-content: center;
   align-items: center;
   text-align: center;
+}
+
+#endBox button {
+  margin: 5px;
+  padding: 10px;
 }
 </style>
 </head>
@@ -135,34 +142,39 @@ body {
 <div id="counter">1 / 1</div>
 
 <div id="app">
+  <div class="flashScreen" id="flashScreen">
+    <div id="flashText"></div>
+  </div>
+
   <div class="card">
     <img id="img" src="" />
   </div>
 </div>
 
+<!-- TIERS -->
 <div id="bottomRow">
-  <button id="sPlus">S+ (5)</button>
+  <button id="sPlus">S+ 🔥</button>
   <button id="s">S</button>
   <button id="a">A</button>
   <button id="b">B</button>
   <button id="c">C</button>
 </div>
 
-<div class="flashScreen" id="flashScreen">
-  <div id="flashText"></div>
-</div>
-
+<!-- END -->
 <div id="endScreen">
-  <div>
+  <div id="endBox">
     <h1>Finished</h1>
     <p id="stats"></p>
+    <button onclick="showBookmarks()">Bookmarks</button>
+    <button onclick="showSPlus()">S+ Photos</button>
     <button onclick="restart()">Restart</button>
   </div>
 </div>
 
 <script>
 
-let imagesBase = 
+/* IMAGES (keep yours here) */
+let imagesBase = [
 "IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
   "IMG_5072.jpeg","IMG_5071.jpeg","IMG_5070.jpeg","IMG_5069.jpeg",
   "IMG_5068.jpeg","IMG_5067.jpeg","IMG_5066.jpeg",
@@ -398,29 +410,24 @@ let imagesBase =
 "IMG_5378.jpeg",
 "IMG_5377.jpeg",
 "IMG_5376.jpeg"
+];
 
 let images = [];
 let index = 0;
-
 let history = [];
 
+/* TIER DATA */
 let sPlus = [];
 let sList = [];
 let aList = [];
 let bList = [];
 let cList = [];
 
-let bookmarks = [];
-let skipped = [];
-
 let sPlusUses = 0;
 const sPlusLimit = 5;
 
-/* UPDATE S+ BUTTON TEXT */
-function updateSPlusUI(){
-  document.getElementById("sPlus").innerText =
-    `S+ (${sPlusLimit - sPlusUses})`;
-}
+let bookmarks = [];
+let skipped = [];
 
 /* shuffle */
 function shuffle(arr){
@@ -446,13 +453,10 @@ function start(){
   skipped = [];
   history = [];
 
-  sPlusUses = 0;
-  updateSPlusUI();
-
   load();
 }
 
-/* counter */
+/* counter fix */
 function updateCounter(){
   document.getElementById("counter").innerText =
     `${index+1} / ${images.length}`;
@@ -479,16 +483,14 @@ function load(){
 function flash(text,color){
   const f=document.getElementById("flashScreen");
   const t=document.getElementById("flashText");
-
   t.innerText=text;
   t.style.color=color;
-
   f.classList.add("flashShow");
   setTimeout(()=>f.classList.remove("flashShow"),400);
 }
 
-/* TIER PICK */
-function pick(tier){
+/* tier select */
+function pickTier(tier){
 
   let img = images[index];
 
@@ -496,13 +498,12 @@ function pick(tier){
 
   if(tier==="sPlus"){
     if(sPlusUses>=sPlusLimit){
-      flash("LOCKED","gold");
+      flash("LOCKED 🔒","gold");
       return;
     }
     sPlusUses++;
     sPlus.push(img);
-    updateSPlusUI();
-    flash("S+","gold");
+    flash("S+ 🔥","gold");
   }
 
   if(tier==="s"){ sList.push(img); flash("S","red"); }
@@ -510,6 +511,11 @@ function pick(tier){
   if(tier==="b"){ bList.push(img); flash("B","blue"); }
   if(tier==="c"){ cList.push(img); flash("C","gray"); }
 
+  next();
+}
+
+/* next */
+function next(){
   index++;
   load();
 }
@@ -526,20 +532,28 @@ function skip(){
 function back(){
   if(!history.length) return;
   let last = history.pop();
+
   index = last.index;
+
+  /* (simple undo — doesn’t fully restore tier removal for simplicity) */
+
   load();
 }
 
 /* bookmark */
-function bookmark(){
+function toggleBookmark(){
   let img = images[index];
-  if(!bookmarks.includes(img)){
+
+  if(bookmarks.includes(img)){
+    bookmarks = bookmarks.filter(i=>i!==img);
+    flash("UNBOOKMARKED","yellow");
+  } else {
     bookmarks.push(img);
     flash("BOOKMARKED","yellow");
   }
 }
 
-/* end */
+/* END */
 function end(){
   document.querySelector(".card").style.display="none";
   document.getElementById("bottomRow").style.display="none";
@@ -548,11 +562,22 @@ function end(){
   document.getElementById("endScreen").style.display="flex";
 
   document.getElementById("stats").innerHTML =
-  `S+: ${sPlus.length}<br>
-   S: ${sList.length}<br>
-   A: ${aList.length}<br>
-   B: ${bList.length}<br>
-   C: ${cList.length}`;
+  `
+  S+: ${sPlus.length}<br>
+  S: ${sList.length}<br>
+  A: ${aList.length}<br>
+  B: ${bList.length}<br>
+  C: ${cList.length}
+  `;
+}
+
+/* views */
+function showBookmarks(){
+  alert(bookmarks.join("\n") || "No bookmarks");
+}
+
+function showSPlus(){
+  alert(sPlus.join("\n") || "No S+ photos");
 }
 
 /* restart */
@@ -561,15 +586,15 @@ function restart(){
 }
 
 /* buttons */
-document.getElementById("sPlus").onclick=()=>pick("sPlus");
-document.getElementById("s").onclick=()=>pick("s");
-document.getElementById("a").onclick=()=>pick("a");
-document.getElementById("b").onclick=()=>pick("b");
-document.getElementById("c").onclick=()=>pick("c");
+document.getElementById("sPlus").onclick=()=>pickTier("sPlus");
+document.getElementById("s").onclick=()=>pickTier("s");
+document.getElementById("a").onclick=()=>pickTier("a");
+document.getElementById("b").onclick=()=>pickTier("b");
+document.getElementById("c").onclick=()=>pickTier("c");
 
 document.getElementById("skip").onclick=skip;
 document.getElementById("back").onclick=back;
-document.getElementById("bookmarkBtn").onclick=bookmark;
+document.getElementById("bookmarkBtn").onclick=toggleBookmark;
 
 start();
 
