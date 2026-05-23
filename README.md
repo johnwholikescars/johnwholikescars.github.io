@@ -22,7 +22,6 @@ body {
   position: relative;
 }
 
-/* RIGHT CORNER SKIP ALL */
 #skipAll {
   position: absolute;
   right: 10px;
@@ -131,11 +130,19 @@ body {
 #endScreen {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0,0,0,0.95);
   display: none;
   justify-content: center;
   align-items: center;
   text-align: center;
+}
+
+#viewerImg {
+  width: 300px;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 10px;
 }
 
 #endBox button {
@@ -174,11 +181,24 @@ body {
   <button id="c">C</button>
 </div>
 
+<!-- END SCREEN -->
 <div id="endScreen">
   <div id="endBox">
+
     <h1>Finished</h1>
+
     <p id="stats"></p>
+
+    <img id="viewerImg" style="display:none;" />
+
+    <br/>
+
+    <button onclick="openViewer('sPlus')">S+ Photos</button>
+    <button onclick="openViewer('bookmarks')">Bookmarked</button>
+    <button onclick="nextPhoto()">Next</button>
+    <button onclick="backToEnd()">Back</button>
     <button onclick="restart()">Restart</button>
+
   </div>
 </div>
 
@@ -187,6 +207,7 @@ body {
 /* IMAGES */
 let imagesBase = [
 "IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
+
 "IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
   "IMG_5072.jpeg","IMG_5071.jpeg","IMG_5070.jpeg","IMG_5069.jpeg",
   "IMG_5068.jpeg","IMG_5067.jpeg","IMG_5066.jpeg",
@@ -434,11 +455,15 @@ let aList = [];
 let bList = [];
 let cList = [];
 
+let bookmarks = [];
+let skipped = [];
+
 let sPlusUses = 0;
 const sPlusLimit = 5;
 
-let bookmarks = [];
-let skipped = [];
+/* viewer system */
+let viewMode = null;
+let viewIndex = 0;
 
 function shuffle(arr){
   for(let i=arr.length-1;i>0;i--){
@@ -506,13 +531,12 @@ function pickTier(tier){
     }
     sPlusUses++;
     sPlus.push(img);
-    flash(`S+ (${sPlusLimit - sPlusUses})`,"gold");
   }
 
-  if(tier==="s"){ sList.push(img); flash("S","red"); }
-  if(tier==="a"){ aList.push(img); flash("A","green"); }
-  if(tier==="b"){ bList.push(img); flash("B","blue"); }
-  if(tier==="c"){ cList.push(img); flash("C","gray"); }
+  if(tier==="s") sList.push(img);
+  if(tier==="a") aList.push(img);
+  if(tier==="b") bList.push(img);
+  if(tier==="c") cList.push(img);
 
   next();
 }
@@ -524,12 +548,10 @@ function next(){
 
 function skip(){
   skipped.push(images[index]);
-  flash("SKIP","cyan");
   index++;
   load();
 }
 
-/* NEW: skip all */
 function skipAll(){
   index = images.length - 1;
   load();
@@ -554,6 +576,7 @@ function toggleBookmark(){
   }
 }
 
+/* END SCREEN */
 function end(){
   document.querySelector(".card").style.display="none";
   document.getElementById("bottomRow").style.display="none";
@@ -562,19 +585,57 @@ function end(){
   document.getElementById("endScreen").style.display="flex";
 
   document.getElementById("stats").innerHTML =
-  `
-  S+: ${sPlus.length}<br>
-  S: ${sList.length}<br>
-  A: ${aList.length}<br>
-  B: ${bList.length}<br>
-  C: ${cList.length}
-  `;
+  `S+: ${sPlus.length}<br>S: ${sList.length}<br>A: ${aList.length}<br>B: ${bList.length}<br>C: ${cList.length}`;
 }
 
+/* VIEWER SYSTEM */
+function openViewer(type){
+  viewMode = type;
+  viewIndex = 0;
+  showViewer();
+}
+
+function showViewer(){
+  let list = viewMode === "sPlus" ? sPlus : bookmarks;
+
+  if(!list.length){
+    alert("No photos in this category");
+    return;
+  }
+
+  document.getElementById("viewerImg").style.display = "block";
+  document.getElementById("viewerImg").src = list[viewIndex];
+}
+
+function nextPhoto(){
+  let list = viewMode === "sPlus" ? sPlus : bookmarks;
+
+  if(!list.length) return;
+
+  viewIndex++;
+
+  if(viewIndex >= list.length){
+    viewMode = null;
+    viewIndex = 0;
+    document.getElementById("viewerImg").style.display = "none";
+    return;
+  }
+
+  showViewer();
+}
+
+function backToEnd(){
+  viewMode = null;
+  viewIndex = 0;
+  document.getElementById("viewerImg").style.display = "none";
+}
+
+/* restart */
 function restart(){
   location.reload();
 }
 
+/* buttons */
 document.getElementById("sPlus").onclick=()=>pickTier("sPlus");
 document.getElementById("s").onclick=()=>pickTier("s");
 document.getElementById("a").onclick=()=>pickTier("a");
