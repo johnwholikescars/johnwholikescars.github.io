@@ -33,21 +33,6 @@ body {
 #skip { background: #4da6ff; color: white; }
 #bookmarkBtn { background: #ffcc00; color: black; }
 
-/* SKIP ALL */
-#skipAll {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  padding: 6px 10px;
-  font-size: 12px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  background: #ff6666;
-  color: white;
-  z-index: 1000;
-}
-
 /* COUNTER */
 #counter {
   text-align: center;
@@ -101,7 +86,7 @@ body {
   font-weight: 900;
 }
 
-/* TIER SCREEN (REAL INTERMISSION) */
+/* TIER SCREEN (NEW) */
 #tierScreen {
   position: fixed;
   inset: 0;
@@ -109,19 +94,15 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 70px;
+  font-size: 60px;
   font-weight: 900;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease;
-  z-index: 10000;
+  transition: 0.2s;
+  z-index: 1000;
 }
 
-.showTier {
-  opacity: 1;
-}
-
-/* BOTTOM ROW */
+/* BOTTOM TIERS */
 #bottomRow {
   position: fixed;
   bottom: 15px;
@@ -141,7 +122,7 @@ body {
   cursor: pointer;
 }
 
-/* TIERS */
+/* tier colors */
 #sPlus { background: gold; color: black; }
 #s { background: #ff4d4d; color: white; }
 #a { background: #4dff88; color: black; }
@@ -158,6 +139,11 @@ body {
   align-items: center;
   text-align: center;
 }
+
+#endBox button {
+  margin: 5px;
+  padding: 10px;
+}
 </style>
 </head>
 
@@ -169,40 +155,43 @@ body {
   <button id="bookmarkBtn">🔖</button>
 </div>
 
-<button id="skipAll">Skip All</button>
-
 <div id="counter">1 / 1</div>
 
 <div id="app">
+
+  <div class="flashScreen" id="flashScreen">
+    <div id="flashText"></div>
+  </div>
+
+  <div id="tierScreen"></div>
+
   <div class="card">
     <img id="img" src="" />
   </div>
+
 </div>
 
-<!-- TIER SCREEN -->
-<div id="tierScreen"></div>
-
-<!-- TIERS -->
 <div id="bottomRow">
-  <button id="sPlus">S+ 🔥 (5)</button>
+  <button id="sPlus">S+ (<span id="sPlusLeft">5</span>)</button>
   <button id="s">S</button>
   <button id="a">A</button>
   <button id="b">B</button>
   <button id="c">C</button>
 </div>
 
-<!-- END -->
 <div id="endScreen">
-  <div>
+  <div id="endBox">
     <h1>Finished</h1>
     <p id="stats"></p>
-    <button onclick="restart()">Play Again</button>
+    <button onclick="showBookmarks()">Bookmarks</button>
+    <button onclick="showSPlus()">S+ Photos</button>
+    <button onclick="restart()">Restart</button>
   </div>
 </div>
 
 <script>
 
-/* IMAGES (keep yours here) */
+/* IMAGES */
 let imagesBase = [
 "IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
 
@@ -445,6 +434,7 @@ let imagesBase = [
 
 let images = [];
 let index = 0;
+let history = [];
 
 let sPlus = [];
 let sList = [];
@@ -454,7 +444,6 @@ let cList = [];
 
 let bookmarks = [];
 let skipped = [];
-let history = [];
 
 let sPlusUses = 0;
 const sPlusLimit = 5;
@@ -478,10 +467,12 @@ function start(){
   aList = [];
   bList = [];
   cList = [];
+
   bookmarks = [];
   skipped = [];
   history = [];
 
+  updateSPlusUI();
   load();
 }
 
@@ -491,8 +482,26 @@ function updateCounter(){
     `${index+1} / ${images.length}`;
 }
 
+/* S+ UI */
+function updateSPlusUI(){
+  document.getElementById("sPlusLeft").innerText =
+    Math.max(0, sPlusLimit - sPlusUses);
+}
+
+/* tier screen */
+function showTierScreen(text){
+  const screen = document.getElementById("tierScreen");
+  screen.innerText = text;
+  screen.style.opacity = 1;
+
+  setTimeout(()=>{
+    screen.style.opacity = 0;
+  }, 350);
+}
+
 /* load */
 function load(){
+
   if(index >= images.length && skipped.length){
     images = [...skipped];
     skipped = [];
@@ -508,53 +517,38 @@ function load(){
   updateCounter();
 }
 
-/* TIER SCREEN (INTERMISSION FIX) */
-function showTierScreen(text){
-  const screen = document.getElementById("tierScreen");
-  screen.innerText = text;
-  screen.classList.add("showTier");
-
-  setTimeout(() => {
-    screen.classList.remove("showTier");
-  }, 400);
-}
-
-/* PICK TIER (FIXED FLOW) */
-function pickTier(t){
+/* tier select */
+function pickTier(tier){
 
   let img = images[index];
-  history.push({index,t});
+  history.push({index,tier});
 
-  let tierText = "";
-
-  if(t==="sPlus"){
-    if(sPlusUses>=sPlusLimit){
+  if(tier === "sPlus"){
+    if(sPlusUses >= sPlusLimit){
       showTierScreen("LOCKED");
       return;
     }
     sPlusUses++;
     sPlus.push(img);
-    tierText = "S+";
+    showTierScreen("S+");
+    updateSPlusUI();
   }
 
-  if(t==="s"){ sList.push(img); tierText="S"; }
-  if(t==="a"){ aList.push(img); tierText="A"; }
-  if(t==="b"){ bList.push(img); tierText="B"; }
-  if(t==="c"){ cList.push(img); tierText="C"; }
+  if(tier === "s"){ sList.push(img); showTierScreen("S"); }
+  if(tier === "a"){ aList.push(img); showTierScreen("A"); }
+  if(tier === "b"){ bList.push(img); showTierScreen("B"); }
+  if(tier === "c"){ cList.push(img); showTierScreen("C"); }
 
-  // SHOW SCREEN FIRST
-  showTierScreen(tierText);
-
-  // THEN MOVE AFTER DELAY (THIS IS THE FIX)
-  setTimeout(() => {
+  setTimeout(()=>{
     index++;
     load();
-  }, 450);
+  }, 350);
 }
 
 /* skip */
 function skip(){
   skipped.push(images[index]);
+  showTierScreen("SKIP");
   index++;
   load();
 }
@@ -570,10 +564,13 @@ function back(){
 /* bookmark */
 function toggleBookmark(){
   let img = images[index];
+
   if(bookmarks.includes(img)){
     bookmarks = bookmarks.filter(i=>i!==img);
+    showTierScreen("UNBOOK");
   } else {
     bookmarks.push(img);
+    showTierScreen("BOOKED");
   }
 }
 
@@ -583,11 +580,25 @@ function end(){
   document.getElementById("bottomRow").style.display="none";
   document.getElementById("topRow").style.display="none";
   document.getElementById("counter").style.display="none";
-  document.getElementById("skipAll").style.display="none";
   document.getElementById("endScreen").style.display="flex";
 
   document.getElementById("stats").innerHTML =
-  `S+: ${sPlus.length}<br>S: ${sList.length}<br>A: ${aList.length}<br>B: ${bList.length}<br>C: ${cList.length}`;
+  `
+  S+: ${sPlus.length}<br>
+  S: ${sList.length}<br>
+  A: ${aList.length}<br>
+  B: ${bList.length}<br>
+  C: ${cList.length}
+  `;
+}
+
+/* views */
+function showBookmarks(){
+  alert(bookmarks.join("\n") || "No bookmarks");
+}
+
+function showSPlus(){
+  alert(sPlus.join("\n") || "No S+ photos");
 }
 
 /* restart */
@@ -609,5 +620,6 @@ document.getElementById("bookmarkBtn").onclick=toggleBookmark;
 start();
 
 </script>
+
 </body>
 </html>
