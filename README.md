@@ -1,94 +1,69 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Photo Tier List</title>
+<title>Tier Photo Rater</title>
 
 <style>
 
+/* ================= BODY (FIXED LAYOUT) ================= */
 body{
   margin:0;
   background:#0f0f0f;
   font-family:Arial;
   color:white;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
   overflow:hidden;
 }
 
-/* TOP BAR */
-
+/* ================= TOP ================= */
 #topArea{
   display:flex;
-  flex-direction:column;
+  justify-content:center;
   align-items:center;
-  margin-top:10px;
-}
-
-#topRow{
-  width:90%;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  padding:10px;
 }
 
 #counter{
-  font-size:20px;
+  font-size:18px;
   font-weight:bold;
 }
 
-/* bookmark */
-
-#bookmarkBtn{
-  background:#222;
-  border:none;
-  color:white;
-  font-size:24px;
+.topButton{
   padding:8px 12px;
+  border:none;
   border-radius:10px;
   cursor:pointer;
 }
 
-/* mini buttons */
+#back{background:#777;color:white;}
+#skip{background:#4da6ff;color:white;}
+#bookmarkBtn{background:#222;color:white;}
 
-#miniButtons{
-  display:flex;
-  gap:10px;
-  margin-top:10px;
-}
-
-#miniButtons button{
-  padding:8px 14px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  font-size:14px;
-}
-
-#back{
-  background:#777;
-  color:white;
-}
-
-#skip{
-  background:#4da6ff;
-  color:white;
-}
-
-/* CARD */
-
+/* ================= CENTER APP ================= */
 #app{
+  flex:1;
   display:flex;
   justify-content:center;
-  margin-top:10px;
+  align-items:center;
+  padding:10px;
 }
 
+/* ================= CARD (NO OVERLAP SAFE) ================= */
 .card{
   width:320px;
   height:420px;
   border-radius:20px;
   overflow:hidden;
   background:#222;
-  position:relative;
-  transition:transform .35s ease, opacity .35s ease;
+
+  margin-bottom:140px; /* KEY FIX */
+  transition:0.3s;
 }
 
 .card img{
@@ -98,51 +73,37 @@ body{
 }
 
 /* animations */
+.fly-right{transform:translateX(500px) rotate(15deg);opacity:0;}
+.fly-left{transform:translateX(-500px) rotate(-15deg);opacity:0;}
+.fly-up{transform:translateY(-500px);opacity:0;}
 
-.fly-right{
-  transform:translateX(500px) rotate(15deg);
-  opacity:0;
-}
-
-.fly-left{
-  transform:translateX(-500px) rotate(-15deg);
-  opacity:0;
-}
-
-.fly-up{
-  transform:translateY(-500px);
-  opacity:0;
-}
-
-/* flash */
-
+/* ================= FLASH ================= */
 .flashScreen{
   position:fixed;
   inset:0;
-  background:black;
   display:flex;
   justify-content:center;
   align-items:center;
+  background:black;
   opacity:0;
   pointer-events:none;
-  transition:opacity .2s ease;
+  transition:.2s;
   z-index:999;
 }
 
-.flashShow{
-  opacity:1;
-}
+.flashShow{opacity:1;}
 
 #flashText{
-  font-size:60px;
+  font-size:38px;
   font-weight:900;
+  text-align:center;
+  padding:20px;
 }
 
-/* BOTTOM BUTTONS */
-
+/* ================= BOTTOM BAR (SAFE FIX) ================= */
 .bottomBar{
   position:fixed;
-  bottom:20px;
+  bottom:0;
   left:0;
   right:0;
 
@@ -151,54 +112,28 @@ body{
   flex-wrap:wrap;
   gap:10px;
 
-  padding:0 15px;
+  padding:15px 10px 25px;
+  background:rgba(0,0,0,.85);
+
+  z-index:10;
 }
 
 .bottomBar button{
-  padding:12px 16px;
+  padding:12px 14px;
   border:none;
   border-radius:12px;
   cursor:pointer;
-  font-size:15px;
   font-weight:bold;
 }
 
-/* tier colors */
+/* tiers */
+#splus{background:gold;color:black;}
+#s{background:#ff4da6;}
+#a{background:#ff9933;}
+#b{background:#4da6ff;}
+#c{background:#666;}
 
-#splus{
-  background:linear-gradient(45deg,#ffd700,#ff4d00);
-  color:black;
-}
-
-#s{
-  background:#ff4da6;
-  color:white;
-}
-
-#a{
-  background:#ff9933;
-  color:white;
-}
-
-#b{
-  background:#4da6ff;
-  color:white;
-}
-
-#c{
-  background:#666;
-  color:white;
-}
-
-/* disabled */
-
-.disabled{
-  opacity:.4;
-  cursor:not-allowed !important;
-}
-
-/* END SCREEN */
-
+/* ================= END SCREEN ================= */
 #endScreen{
   position:fixed;
   inset:0;
@@ -210,21 +145,8 @@ body{
   padding:20px;
 }
 
-#endContent{
-  max-width:350px;
-}
-
-#endContent h1{
-  margin-bottom:20px;
-}
-
-#stats{
-  font-size:20px;
-  line-height:1.8;
-}
-
 .endButtons{
-  margin-top:20px;
+  margin-top:15px;
   display:flex;
   flex-direction:column;
   gap:10px;
@@ -235,29 +157,27 @@ body{
   border:none;
   border-radius:10px;
   cursor:pointer;
-  font-size:16px;
 }
 
-/* bookmark gallery */
-
-#bookmarkGallery{
+/* ================= GALLERIES ================= */
+#gallery,#splusGallery{
   position:fixed;
   inset:0;
-  background:#000;
+  background:black;
   display:none;
   overflow-y:auto;
   padding:20px;
 }
 
-#bookmarkGrid{
+.grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-  gap:15px;
+  gap:10px;
 }
 
-#bookmarkGrid img{
+.grid img{
   width:100%;
-  border-radius:12px;
+  border-radius:10px;
 }
 
 </style>
@@ -266,92 +186,65 @@ body{
 <body>
 
 <!-- TOP -->
-
 <div id="topArea">
+  <div id="counter">1 / 1</div>
 
-  <div id="topRow">
-    <div id="counter">1 / 1</div>
-
-    <button id="bookmarkBtn">🔖</button>
-  </div>
-
-  <div id="miniButtons">
-    <button id="back">⬅ Back</button>
-    <button id="skip">⏭ Skip</button>
-  </div>
-
+  <button id="back" class="topButton">⬅ Back</button>
+  <button id="skip" class="topButton">⏭ Skip</button>
+  <button id="bookmarkBtn" class="topButton">🔖 Bookmark</button>
 </div>
 
-<!-- APP -->
-
+<!-- CENTER -->
 <div id="app">
-
   <div class="flashScreen" id="flashScreen">
     <div id="flashText"></div>
   </div>
 
   <div class="card" id="card">
-    <img id="img" src="" />
+    <img id="img" />
   </div>
-
 </div>
 
-<!-- TIER BUTTONS -->
-
+<!-- BOTTOM -->
 <div class="bottomBar">
-
   <button id="splus">👑 S+ (5)</button>
-
-  <button id="s">S Tier</button>
-
-  <button id="a">A Tier</button>
-
-  <button id="b">B Tier</button>
-
-  <button id="c">C Tier</button>
-
+  <button id="s">S</button>
+  <button id="a">A</button>
+  <button id="b">B</button>
+  <button id="c">C</button>
 </div>
 
 <!-- END -->
-
 <div id="endScreen">
-
-  <div id="endContent">
-
+  <div>
     <h1>Finished!</h1>
 
     <div id="stats"></div>
 
     <div class="endButtons">
-      <button onclick="showBookmarks()">🔖 View Bookmarks</button>
+      <button onclick="showBookmarks()">🔖 Bookmarks</button>
+      <button onclick="showSPlus()">👑 S+ Photos</button>
       <button onclick="restart()">Play Again</button>
     </div>
-
   </div>
-
 </div>
 
-<!-- BOOKMARK GALLERY -->
+<!-- GALLERIES -->
+<div id="gallery">
+  <h2>Bookmarks</h2>
+  <div class="grid" id="grid"></div>
+  <button onclick="closeGallery()">Close</button>
+</div>
 
-<div id="bookmarkGallery">
-
-  <h1>🔖 Bookmarked Photos</h1>
-
-  <br>
-
-  <div id="bookmarkGrid"></div>
-
-  <br><br>
-
-  <button onclick="closeBookmarks()"
-    style="padding:12px 20px;border:none;border-radius:10px;">
-    Close
-  </button>
-
+<div id="splusGallery">
+  <h2>S+ Photos</h2>
+  <div class="grid" id="grid2"></div>
+  <button onclick="closeSPlus()">Close</button>
 </div>
 
 <script>
 
+/* ================= IMAGES ================= */
 let imagesBase = [
 "IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
   "IMG_5072.jpeg","IMG_5071.jpeg","IMG_5070.jpeg","IMG_5069.jpeg",
@@ -589,357 +482,192 @@ let imagesBase = [
 "IMG_5377.jpeg",
 "IMG_5376.jpeg"
 ];
+/* ================= STATE ================= */
+let images=[], skipped=[], history=[];
+let bookmarks=[], splusPhotos=[];
+let index=0;
 
-/* ========================= */
-
-let images = [];
-let skipped = [];
-let history = [];
-let bookmarks = [];
-
-let index = 0;
-
-let splus = 0;
-let sTier = 0;
-let aTier = 0;
-let bTier = 0;
-let cTier = 0;
+let splus=0,s=0,a=0,b=0,c=0;
 
 /* shuffle */
-
 function shuffle(arr){
-
-  for(let i = arr.length - 1; i > 0; i--){
-
-    let j = Math.floor(Math.random() * (i + 1));
-
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+  for(let i=arr.length-1;i>0;i--){
+    let j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
   }
-
   return arr;
 }
 
 /* start */
-
 function start(){
-
-  images = shuffle([...imagesBase]);
-
-  skipped = [];
-  history = [];
-
-  index = 0;
-
-  splus = 0;
-  sTier = 0;
-  aTier = 0;
-  bTier = 0;
-  cTier = 0;
-
-  bookmarks = [];
-
-  updateSPlusButton();
-
+  images=shuffle([...imagesBase]);
+  skipped=[]; history=[];
+  bookmarks=[]; splusPhotos=[];
+  index=0;
+  splus=s=a=b=c=0;
   load();
 }
 
 /* counter */
-
 function updateCounter(){
-
   document.getElementById("counter").innerText =
-    `${index + 1} / ${images.length}`;
+    `${index+1} / ${images.length}`;
 }
 
-/* load image */
-
+/* load */
 function load(){
 
-  if(index >= images.length && skipped.length > 0){
-
-    images = [...skipped];
-    skipped = [];
-    index = 0;
+  if(index>=images.length && skipped.length){
+    images=[...skipped];
+    skipped=[];
+    index=0;
   }
 
-  if(index >= images.length){
-
+  if(index>=images.length){
     end();
     return;
   }
 
-  document.getElementById("img").src = images[index];
-
+  document.getElementById("img").src=images[index];
   updateCounter();
 }
 
 /* flash */
+function flash(t,c){
+  let f=document.getElementById("flashScreen");
+  let txt=document.getElementById("flashText");
 
-function flash(text,color){
-
-  const f = document.getElementById("flashScreen");
-  const t = document.getElementById("flashText");
-
-  t.innerText = text;
-  t.style.color = color;
+  txt.innerText=t;
+  txt.style.color=c;
 
   f.classList.add("flashShow");
-
-  setTimeout(()=>{
-    f.classList.remove("flashShow");
-  },500);
+  setTimeout(()=>f.classList.remove("flashShow"),400);
 }
 
-/* tier */
+/* choose */
+function choose(type){
 
-function chooseTier(type){
+  history.push({index,type});
 
-  const card = document.getElementById("card");
-
-  history.push({
-    index:index,
-    action:type
-  });
-
-  if(type === "splus"){
-
-    if(splus >= 5) return;
-
+  if(type==="splus"){
+    if(splus>=5)return;
     splus++;
-
-    card.classList.add("fly-right");
-
-    flash("👑 S+", "#ffd700");
-
-    updateSPlusButton();
+    splusPhotos.push(images[index]);
+    flash("S+","#ffd700");
   }
 
-  if(type === "s"){
+  if(type==="s"){s++;flash("S","#ff4da6");}
+  if(type==="a"){a++;flash("A","#ff9933");}
+  if(type==="b"){b++;flash("B","#4da6ff");}
+  if(type==="c"){c++;flash("C","#888");}
 
-    sTier++;
-
-    card.classList.add("fly-right");
-
-    flash("S TIER", "#ff4da6");
-  }
-
-  if(type === "a"){
-
-    aTier++;
-
-    card.classList.add("fly-right");
-
-    flash("A TIER", "#ff9933");
-  }
-
-  if(type === "b"){
-
-    bTier++;
-
-    card.classList.add("fly-left");
-
-    flash("B TIER", "#4da6ff");
-  }
-
-  if(type === "c"){
-
-    cTier++;
-
-    card.classList.add("fly-left");
-
-    flash("C TIER", "#777");
-  }
-
-  setTimeout(()=>{
-
-    card.classList.remove("fly-right","fly-left");
-
-    index++;
-
-    load();
-
-  },350);
-}
-
-/* update s+ */
-
-function updateSPlusButton(){
-
-  const btn = document.getElementById("splus");
-
-  btn.innerText = `👑 S+ (${5 - splus})`;
-
-  if(splus >= 5){
-
-    btn.innerText = "👑 S+ LOCKED";
-
-    btn.classList.add("disabled");
-  }
+  index++;
+  load();
 }
 
 /* skip */
-
 function skip(){
-
-  const card = document.getElementById("card");
-
   skipped.push(images[index]);
-
-  history.push({
-    index:index,
-    action:"skip"
-  });
-
-  card.classList.add("fly-up");
-
-  flash("SKIP", "#4da6ff");
-
-  setTimeout(()=>{
-
-    card.classList.remove("fly-up");
-
-    index++;
-
-    load();
-
-  },350);
+  history.push({index,type:"skip"});
+  flash("SKIP","#4da6ff");
+  index++;
+  load();
 }
 
 /* back */
-
 function back(){
+  if(!history.length)return;
 
-  if(history.length === 0) return;
+  let last=history.pop();
+  index=last.index;
 
-  const previous = history.pop();
-
-  if(previous.action === "splus"){
-    splus--;
-    updateSPlusButton();
-  }
-
-  if(previous.action === "s"){
-    sTier--;
-  }
-
-  if(previous.action === "a"){
-    aTier--;
-  }
-
-  if(previous.action === "b"){
-    bTier--;
-  }
-
-  if(previous.action === "c"){
-    cTier--;
-  }
-
-  if(previous.action === "skip"){
-    skipped.pop();
-  }
-
-  index = previous.index;
+  if(last.type==="splus"){splus--;splusPhotos.pop();}
+  if(last.type==="s")s--;
+  if(last.type==="a")a--;
+  if(last.type==="b")b--;
+  if(last.type==="c")c--;
 
   load();
 }
 
 /* bookmark */
-
-function bookmarkCurrent(){
-
-  const current = images[index];
-
-  if(!bookmarks.includes(current)){
-
-    bookmarks.push(current);
-
-    flash("BOOKMARKED 🔖","#ffffff");
+function bookmark(){
+  if(!bookmarks.includes(images[index])){
+    bookmarks.push(images[index]);
+    flash("BOOKMARKED","#fff");
   }
 }
 
 /* end */
-
 function end(){
 
-  document.querySelector(".card").style.display = "none";
+  document.getElementById("card").style.display="none";
+  document.querySelector(".bottomBar").style.display="none";
+  document.getElementById("topArea").style.display="none";
 
-  document.querySelector(".bottomBar").style.display = "none";
+  document.getElementById("endScreen").style.display="flex";
 
-  document.getElementById("topArea").style.display = "none";
-
-  document.getElementById("endScreen").style.display = "flex";
-
-  document.getElementById("stats").innerHTML = `
-    👑 S+ Tier: ${splus}<br>
-    💖 S Tier: ${sTier}<br>
-    🔥 A Tier: ${aTier}<br>
-    👍 B Tier: ${bTier}<br>
-    👎 C Tier: ${cTier}<br>
+  document.getElementById("stats").innerHTML=`
+    👑 S+: ${splus}<br>
+    💖 S: ${s}<br>
+    🔥 A: ${a}<br>
+    👍 B: ${b}<br>
+    👎 C: ${c}<br>
     🔖 Bookmarks: ${bookmarks.length}
   `;
 }
 
 /* restart */
-
 function restart(){
-
-  document.querySelector(".card").style.display = "block";
-
-  document.querySelector(".bottomBar").style.display = "flex";
-
-  document.getElementById("topArea").style.display = "flex";
-
-  document.getElementById("endScreen").style.display = "none";
-
+  document.getElementById("card").style.display="block";
+  document.querySelector(".bottomBar").style.display="flex";
+  document.getElementById("topArea").style.display="flex";
+  document.getElementById("endScreen").style.display="none";
   start();
 }
 
-/* bookmark gallery */
-
+/* galleries */
 function showBookmarks(){
-
-  document.getElementById("bookmarkGallery").style.display = "block";
-
-  const grid = document.getElementById("bookmarkGrid");
-
-  grid.innerHTML = "";
-
-  bookmarks.forEach(photo => {
-
-    const img = document.createElement("img");
-
-    img.src = photo;
-
-    grid.appendChild(img);
-
+  document.getElementById("gallery").style.display="block";
+  let g=document.getElementById("grid");
+  g.innerHTML="";
+  bookmarks.forEach(i=>{
+    let img=document.createElement("img");
+    img.src=i;
+    g.appendChild(img);
   });
 }
 
-function closeBookmarks(){
+function showSPlus(){
+  document.getElementById("splusGallery").style.display="block";
+  let g=document.getElementById("grid2");
+  g.innerHTML="";
+  splusPhotos.forEach(i=>{
+    let img=document.createElement("img");
+    img.src=i;
+    g.appendChild(img);
+  });
+}
 
-  document.getElementById("bookmarkGallery").style.display = "none";
+function closeGallery(){
+  document.getElementById("gallery").style.display="none";
+}
+
+function closeSPlus(){
+  document.getElementById("splusGallery").style.display="none";
 }
 
 /* buttons */
-
-document.getElementById("splus").onclick = ()=>chooseTier("splus");
-
-document.getElementById("s").onclick = ()=>chooseTier("s");
-
-document.getElementById("a").onclick = ()=>chooseTier("a");
-
-document.getElementById("b").onclick = ()=>chooseTier("b");
-
-document.getElementById("c").onclick = ()=>chooseTier("c");
-
-document.getElementById("skip").onclick = skip;
-
-document.getElementById("back").onclick = back;
-
-document.getElementById("bookmarkBtn").onclick = bookmarkCurrent;
+document.getElementById("splus").onclick=()=>choose("splus");
+document.getElementById("s").onclick=()=>choose("s");
+document.getElementById("a").onclick=()=>choose("a");
+document.getElementById("b").onclick=()=>choose("b");
+document.getElementById("c").onclick=()=>choose("c");
+document.getElementById("skip").onclick=skip;
+document.getElementById("back").onclick=back;
+document.getElementById("bookmarkBtn").onclick=bookmark;
 
 /* start */
-
 start();
 
 </script>
