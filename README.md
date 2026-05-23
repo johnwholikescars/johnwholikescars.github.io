@@ -33,7 +33,7 @@ body {
 #skip { background: #4da6ff; color: white; }
 #bookmarkBtn { background: #ffcc00; color: black; }
 
-/* SKIP ALL (TOP RIGHT) */
+/* SKIP ALL */
 #skipAll {
   position: fixed;
   top: 10px;
@@ -101,6 +101,26 @@ body {
   font-weight: 900;
 }
 
+/* TIER POP SCREEN (NEW) */
+#tierScreen {
+  position: fixed;
+  inset: 0;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 60px;
+  font-weight: 900;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.2s;
+  z-index: 10000;
+}
+
+.showTier {
+  opacity: 1;
+}
+
 /* BOTTOM ROW */
 #bottomRow {
   position: fixed;
@@ -140,10 +160,6 @@ body {
 }
 
 /* VIEWER */
-#viewer {
-  margin-top: 15px;
-}
-
 #viewer img {
   width: 250px;
   height: 350px;
@@ -155,7 +171,6 @@ body {
 
 <body>
 
-<!-- TOP -->
 <div id="topRow">
   <button id="back">⬅</button>
   <button id="skip">⏭</button>
@@ -167,14 +182,13 @@ body {
 <div id="counter">1 / 1</div>
 
 <div id="app">
-  <div class="flashScreen" id="flashScreen">
-    <div id="flashText"></div>
-  </div>
-
   <div class="card">
     <img id="img" src="" />
   </div>
 </div>
+
+<!-- NEW TIER SCREEN -->
+<div id="tierScreen"></div>
 
 <!-- TIERS -->
 <div id="bottomRow">
@@ -206,9 +220,8 @@ body {
 
 <script>
 
-/* IMAGES (keep yours) */
-let imagesBase = [
-"IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
+/* IMAGES (unchanged placeholder) */
+let imagesBase = ["IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
 
 "IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
   "IMG_5072.jpeg","IMG_5071.jpeg","IMG_5070.jpeg","IMG_5069.jpeg",
@@ -444,53 +457,39 @@ let imagesBase = [
 "IMG_5379.jpeg",
 "IMG_5378.jpeg",
 "IMG_5377.jpeg",
-"IMG_5376.jpeg"
-];
-/* STATE */
-let images = [];
-let index = 0;
+"IMG_5376.jpeg"];
 
-let sPlus = [];
-let sList = [];
-let aList = [];
-let bList = [];
-let cList = [];
+let images=[], index=0;
 
-let sPlusUses = 0;
-const sPlusLimit = 5;
+/* TIERS */
+let sPlus=[], sList=[], aList=[], bList=[], cList=[];
+let bookmarks=[], skipped=[], history=[];
 
-let bookmarks = [];
-let skipped = [];
-let history = [];
+/* S+ LIMIT */
+let sPlusUses=0;
+const sPlusLimit=5;
 
 /* VIEWER */
-let viewList = [];
-let viewIndex = 0;
+let viewList=[], viewIndex=0;
 
 /* SHUFFLE */
-function shuffle(arr){
-  for(let i=arr.length-1;i>0;i--){
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){
     let j=Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]]=[arr[j],arr[i]];
+    [a[i],a[j]]=[a[j],a[i]];
   }
-  return arr;
+  return a;
 }
 
 /* START */
 function start(){
   images = shuffle([...imagesBase]);
-  index = 0;
+  index=0;
 
-  sPlus = [];
-  sList = [];
-  aList = [];
-  bList = [];
-  cList = [];
+  sPlus=[];sList=[];aList=[];bList=[];cList=[];
+  bookmarks=[];skipped=[];history=[];
 
-  bookmarks = [];
-  skipped = [];
-  history = [];
-
+  updateSPlusButton();
   load();
 }
 
@@ -500,16 +499,21 @@ function updateCounter(){
     `${index+1} / ${images.length}`;
 }
 
+/* S+ BUTTON LIVE UPDATE */
+function updateSPlusButton(){
+  document.getElementById("sPlus").innerText =
+    `S+ 🔥 (${sPlusLimit - sPlusUses})`;
+}
+
 /* LOAD */
 function load(){
-
-  if(index >= images.length && skipped.length){
-    images = [...skipped];
-    skipped = [];
-    index = 0;
+  if(index>=images.length && skipped.length){
+    images=[...skipped];
+    skipped=[];
+    index=0;
   }
 
-  if(index >= images.length){
+  if(index>=images.length){
     end();
     return;
   }
@@ -518,36 +522,48 @@ function load(){
   updateCounter();
 }
 
-/* FLASH */
-function flash(text,color){
-  const f=document.getElementById("flashScreen");
-  const t=document.getElementById("flashText");
-  t.innerText=text;
-  t.style.color=color;
-  f.classList.add("flashShow");
-  setTimeout(()=>f.classList.remove("flashShow"),400);
+/* TIER SCREEN POP */
+function showTierScreen(text){
+  const screen=document.getElementById("tierScreen");
+  screen.innerText=text;
+  screen.classList.add("showTier");
+
+  setTimeout(()=>{
+    screen.classList.remove("showTier");
+  },300);
 }
 
-/* TIER */
+/* FLASH */
+function flash(t,c){
+  const f=document.getElementById("flashScreen");
+  const x=document.getElementById("flashText");
+  x.innerText=t;
+  x.style.color=c;
+  f.classList.add("flashShow");
+  setTimeout(()=>f.classList.remove("flashShow"),300);
+}
+
+/* PICK TIER */
 function pickTier(t){
 
-  let img = images[index];
+  let img=images[index];
   history.push({index,t});
 
   if(t==="sPlus"){
     if(sPlusUses>=sPlusLimit){
-      flash("LOCKED 🔒","gold");
+      flash("LOCKED","gold");
       return;
     }
     sPlusUses++;
     sPlus.push(img);
-    flash(`S+ (${5-sPlusUses})`,"gold");
+    updateSPlusButton();
+    showTierScreen("S+");
   }
 
-  if(t==="s") sList.push(img);
-  if(t==="a") aList.push(img);
-  if(t==="b") bList.push(img);
-  if(t==="c") cList.push(img);
+  if(t==="s"){ sList.push(img); showTierScreen("S"); }
+  if(t==="a"){ aList.push(img); showTierScreen("A"); }
+  if(t==="b"){ bList.push(img); showTierScreen("B"); }
+  if(t==="c"){ cList.push(img); showTierScreen("C"); }
 
   index++;
   load();
@@ -556,7 +572,6 @@ function pickTier(t){
 /* SKIP */
 function skip(){
   skipped.push(images[index]);
-  flash("SKIP","cyan");
   index++;
   load();
 }
@@ -564,26 +579,24 @@ function skip(){
 /* BACK */
 function back(){
   if(!history.length) return;
-  let last = history.pop();
-  index = last.index;
+  let last=history.pop();
+  index=last.index;
   load();
 }
 
 /* BOOKMARK */
 function toggleBookmark(){
-  let img = images[index];
+  let img=images[index];
   if(bookmarks.includes(img)){
-    bookmarks = bookmarks.filter(i=>i!==img);
-    flash("UNBOOKMARKED","yellow");
+    bookmarks=bookmarks.filter(i=>i!==img);
   } else {
     bookmarks.push(img);
-    flash("BOOKMARKED","yellow");
   }
 }
 
 /* SKIP ALL */
 function skipAll(){
-  index = images.length - 1;
+  index=images.length-1;
   load();
 }
 
@@ -597,32 +610,22 @@ function end(){
   document.getElementById("endScreen").style.display="flex";
 
   document.getElementById("stats").innerHTML =
-  `
-  S+: ${sPlus.length}<br>
-  S: ${sList.length}<br>
-  A: ${aList.length}<br>
-  B: ${bList.length}<br>
-  C: ${cList.length}
-  `;
+  `S+: ${sPlus.length}<br>S: ${sList.length}<br>A: ${aList.length}<br>B: ${bList.length}<br>C: ${cList.length}`;
 }
 
 /* VIEWER */
 function openViewer(type){
+  viewList = type==="bookmarks"?bookmarks:sPlus;
+  viewIndex=0;
 
-  viewList = type==="bookmarks" ? [...bookmarks] : [...sPlus];
-  viewIndex = 0;
-
-  if(viewList.length===0){
-    flash("EMPTY","white");
-    return;
-  }
+  if(!viewList.length) return;
 
   document.getElementById("viewer").style.display="block";
   showImage();
 }
 
 function showImage(){
-  document.getElementById("viewerImg").src = viewList[viewIndex];
+  document.getElementById("viewerImg").src=viewList[viewIndex];
 }
 
 function nextImage(){
@@ -658,6 +661,5 @@ document.getElementById("skipAll").onclick=skipAll;
 start();
 
 </script>
-
 </body>
 </html>
