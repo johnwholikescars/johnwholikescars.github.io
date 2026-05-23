@@ -2,7 +2,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>PhotoRank</title>
+
+<title>Photo Tier List</title>
 
 <style>
 
@@ -15,7 +16,6 @@ body{
 }
 
 /* TOP */
-
 #topArea{
   display:flex;
   flex-direction:column;
@@ -29,8 +29,7 @@ body{
   margin-bottom:8px;
 }
 
-/* mini buttons */
-
+/* BACK + SKIP */
 #miniButtons{
   display:flex;
   gap:10px;
@@ -46,7 +45,7 @@ body{
 }
 
 #back{
-  background:#777;
+  background:#888;
   color:white;
 }
 
@@ -56,18 +55,15 @@ body{
 }
 
 /* APP */
-
 #app{
   display:flex;
-  flex-direction:column;
-  align-items:center;
+  justify-content:center;
 }
 
 /* CARD */
-
 .card{
   width:320px;
-  height:420px;
+  height:360px;
   border-radius:20px;
   overflow:hidden;
   background:#222;
@@ -83,14 +79,13 @@ body{
 }
 
 /* ANIMATIONS */
-
 .fly-right{
-  transform:translateX(500px) rotate(18deg);
+  transform:translateX(500px) rotate(20deg);
   opacity:0;
 }
 
 .fly-left{
-  transform:translateX(-500px) rotate(-18deg);
+  transform:translateX(-500px) rotate(-20deg);
   opacity:0;
 }
 
@@ -100,7 +95,6 @@ body{
 }
 
 /* FLASH */
-
 .flashScreen{
   position:fixed;
   inset:0;
@@ -119,34 +113,31 @@ body{
 }
 
 #flashText{
-  font-size:58px;
+  font-size:56px;
   font-weight:900;
-  text-shadow:0 0 25px rgba(255,255,255,0.2);
 }
 
-/* BOTTOM BUTTONS */
-
+/* TIER BUTTONS */
 .bottomBar{
   position:fixed;
-  bottom:20px;
+  bottom:8px;
   left:0;
   right:0;
   display:flex;
   justify-content:center;
   gap:10px;
   flex-wrap:wrap;
+  padding:12px;
 }
 
 .bottomBar button{
   padding:12px 16px;
   border:none;
-  border-radius:10px;
-  font-size:15px;
+  border-radius:12px;
   cursor:pointer;
+  font-size:15px;
   font-weight:bold;
 }
-
-/* TIER COLORS */
 
 #sTier{
   background:#ffd700;
@@ -169,19 +160,18 @@ body{
 }
 
 /* END SCREEN */
-
 #endScreen{
   position:fixed;
   inset:0;
-  display:none;
-  justify-content:center;
-  align-items:center;
   background:rgba(0,0,0,0.92);
+  display:none;
+  align-items:center;
+  justify-content:center;
   text-align:center;
 }
 
 #endBox{
-  background:#1b1b1b;
+  background:#181818;
   padding:30px;
   border-radius:20px;
   width:300px;
@@ -191,19 +181,13 @@ body{
   margin-top:0;
 }
 
-#stats{
-  line-height:2;
-  font-size:18px;
-}
-
-#playAgain{
+#endBox button{
   margin-top:15px;
   padding:12px 18px;
   border:none;
   border-radius:10px;
-  background:white;
   cursor:pointer;
-  font-weight:bold;
+  font-size:16px;
 }
 
 </style>
@@ -212,12 +196,9 @@ body{
 <body>
 
 <!-- TOP -->
-
 <div id="topArea">
 
-  <div id="counter">
-    1 / 1
-  </div>
+  <div id="counter">1 / 1</div>
 
   <div id="miniButtons">
     <button id="back">⬅ Back</button>
@@ -227,7 +208,6 @@ body{
 </div>
 
 <!-- APP -->
-
 <div id="app">
 
   <div class="flashScreen" id="flashScreen">
@@ -240,33 +220,26 @@ body{
 
 </div>
 
-<!-- BOTTOM -->
-
+<!-- TIER BUTTONS -->
 <div class="bottomBar">
 
-  <button id="sTier">⭐ S Tier</button>
-
-  <button id="aTier">🟢 A Tier</button>
-
-  <button id="bTier">🔵 B Tier</button>
-
-  <button id="cTier">🔴 C Tier</button>
+  <button id="sTier">S Tier 👑</button>
+  <button id="aTier">A Tier 🔥</button>
+  <button id="bTier">B Tier 👍</button>
+  <button id="cTier">C Tier 👎</button>
 
 </div>
 
 <!-- END -->
-
 <div id="endScreen">
 
   <div id="endBox">
 
-    <h1>Rankings Complete</h1>
+    <h1>Finished!</h1>
 
-    <div id="stats"></div>
+    <p id="stats"></p>
 
-    <button id="playAgain" onclick="restart()">
-      Play Again
-    </button>
+    <button onclick="restart()">Play Again</button>
 
   </div>
 
@@ -274,10 +247,7 @@ body{
 
 <script>
 
-/* =========================
-   YOUR IMAGES
-========================= */
-
+/* IMAGES */
 let imagesBase = [
 "IMG_5076.jpeg","IMG_5075.jpeg","IMG_5074.jpeg","IMG_5073.jpeg",
   "IMG_5072.jpeg","IMG_5071.jpeg","IMG_5070.jpeg","IMG_5069.jpeg",
@@ -288,13 +258,11 @@ let imagesBase = [
   "IMG_5120.jpeg","IMG_5121.jpeg","IMG_5125.jpeg",
   "IMG_5124.jpeg","IMG_5123.jpeg","IMG_5128.jpeg",
   "IMG_5127.jpeg","IMG_5126.jpeg",
-
   "IMG_5163.jpeg","IMG_5162.jpeg","IMG_5161.jpeg",
   "IMG_5160.jpeg","IMG_5159.jpeg","IMG_5158.jpeg",
   "IMG_5157.jpeg","IMG_5156.jpeg","IMG_5155.jpeg",
   "IMG_5154.jpeg","IMG_5153.jpeg","IMG_5152.jpeg",
   "IMG_5151.jpeg","IMG_5150.jpeg","IMG_5149.jpeg",
-
   "IMG_5182.jpeg","IMG_5183.jpeg","IMG_5184.jpeg",
   "IMG_5185.jpeg","IMG_5187.jpeg","IMG_5188.jpeg",
   "IMG_5189.jpeg","IMG_5190.jpeg","IMG_5191.jpeg",
@@ -305,18 +273,15 @@ let imagesBase = [
   "IMG_5204.jpeg","IMG_5205.jpeg","IMG_5206.jpeg",
   "IMG_5207.jpeg","IMG_5208.jpeg","IMG_5209.jpeg",
   "IMG_5210.jpeg","IMG_5211.jpeg","IMG_5212.jpeg",
-
   "IMG_5265.jpeg","IMG_5264.jpeg","IMG_5263.jpeg",
   "IMG_5262.jpeg","IMG_5261.jpeg","IMG_5260.jpeg",
   "IMG_5259.jpeg","IMG_5258.jpeg","IMG_5257.jpeg",
   "IMG_5256.jpeg","IMG_5255.jpeg","IMG_5254.jpeg",
   "IMG_5253.jpeg","IMG_5252.jpeg","IMG_5251.jpeg",
-
   "IMG_5229.jpeg","IMG_5228.jpeg","IMG_5227.jpeg",
   "IMG_5226.jpeg","IMG_5225.jpeg","IMG_5224.jpeg",
   "IMG_5223.jpeg","IMG_5222.jpeg","IMG_5221.jpeg",
   "IMG_5220.jpeg",
-
   "IMG_5325.jpeg","IMG_5324.jpeg","IMG_5323.jpeg",
   "IMG_5322.jpeg","IMG_5321.jpeg","IMG_5320.jpeg",
   "IMG_5319.jpeg","IMG_5318.jpeg","IMG_5317.jpeg",
@@ -516,10 +481,7 @@ let imagesBase = [
 "IMG_5376.jpeg"
 ];
 
-/* =========================
-   STATE
-========================= */
-
+/* VARIABLES */
 let images = [];
 let skipped = [];
 let history = [];
@@ -531,10 +493,7 @@ let aCount = 0;
 let bCount = 0;
 let cCount = 0;
 
-/* =========================
-   SHUFFLE
-========================= */
-
+/* SHUFFLE */
 function shuffle(arr){
 
   for(let i = arr.length - 1; i > 0; i--){
@@ -547,10 +506,7 @@ function shuffle(arr){
   return arr;
 }
 
-/* =========================
-   START
-========================= */
-
+/* START */
 function start(){
 
   images = shuffle([...imagesBase]);
@@ -568,35 +524,26 @@ function start(){
   load();
 }
 
-/* =========================
-   COUNTER
-========================= */
-
+/* COUNTER */
 function updateCounter(){
 
   document.getElementById("counter").innerText =
     `${index + 1} / ${images.length}`;
 }
 
-/* =========================
-   LOAD IMAGE
-========================= */
-
+/* LOAD IMAGE */
 function load(){
 
   if(index >= images.length && skipped.length > 0){
 
     images = [...skipped];
-
     skipped = [];
-
     index = 0;
   }
 
   if(index >= images.length){
 
     end();
-
     return;
   }
 
@@ -605,18 +552,13 @@ function load(){
   updateCounter();
 }
 
-/* =========================
-   FLASH
-========================= */
-
-function flash(text, color){
+/* FLASH */
+function flash(text,color){
 
   const flashScreen = document.getElementById("flashScreen");
-
   const flashText = document.getElementById("flashText");
 
   flashText.innerText = text;
-
   flashText.style.color = color;
 
   flashScreen.classList.add("flashShow");
@@ -625,14 +567,11 @@ function flash(text, color){
 
     flashScreen.classList.remove("flashShow");
 
-  }, 500);
+  },500);
 }
 
-/* =========================
-   RATE
-========================= */
-
-function rate(tier){
+/* TIER */
+function chooseTier(tier){
 
   const card = document.getElementById("card");
 
@@ -641,58 +580,40 @@ function rate(tier){
     action:tier
   });
 
-  if(tier === "s"){
-
+  if(tier === "S"){
     sCount++;
-
-    card.classList.add("fly-right");
-
-    flash("⭐ S TIER", "#ffd700");
+    flash("S TIER 👑","#ffd700");
   }
 
-  if(tier === "a"){
-
+  if(tier === "A"){
     aCount++;
-
-    card.classList.add("fly-right");
-
-    flash("🟢 A TIER", "#4dff88");
+    flash("A TIER 🔥","#4dff88");
   }
 
-  if(tier === "b"){
-
+  if(tier === "B"){
     bCount++;
-
-    card.classList.add("fly-left");
-
-    flash("🔵 B TIER", "#4da6ff");
+    flash("B TIER 👍","#4da6ff");
   }
 
-  if(tier === "c"){
-
+  if(tier === "C"){
     cCount++;
-
-    card.classList.add("fly-left");
-
-    flash("🔴 C TIER", "#ff4d4d");
+    flash("C TIER 👎","#ff4d4d");
   }
+
+  card.classList.add("fly-right");
 
   setTimeout(() => {
 
     card.classList.remove("fly-right");
-    card.classList.remove("fly-left");
 
     index++;
 
     load();
 
-  }, 350);
+  },350);
 }
 
-/* =========================
-   SKIP
-========================= */
-
+/* SKIP */
 function skip(){
 
   const card = document.getElementById("card");
@@ -704,9 +625,9 @@ function skip(){
     action:"skip"
   });
 
-  card.classList.add("fly-up");
+  flash("SKIPPED ⏭","#4da6ff");
 
-  flash("⏭ SKIPPED", "#4da6ff");
+  card.classList.add("fly-up");
 
   setTimeout(() => {
 
@@ -716,26 +637,20 @@ function skip(){
 
     load();
 
-  }, 350);
+  },350);
 }
 
-/* =========================
-   BACK
-========================= */
-
+/* BACK */
 function back(){
 
   if(history.length === 0) return;
 
   const previous = history.pop();
 
-  if(previous.action === "s") sCount--;
-
-  if(previous.action === "a") aCount--;
-
-  if(previous.action === "b") bCount--;
-
-  if(previous.action === "c") cCount--;
+  if(previous.action === "S") sCount--;
+  if(previous.action === "A") aCount--;
+  if(previous.action === "B") bCount--;
+  if(previous.action === "C") cCount--;
 
   if(previous.action === "skip"){
     skipped.pop();
@@ -746,42 +661,28 @@ function back(){
   load();
 }
 
-/* =========================
-   END SCREEN
-========================= */
-
+/* END */
 function end(){
 
   document.querySelector(".card").style.display = "none";
-
   document.querySelector(".bottomBar").style.display = "none";
-
   document.getElementById("topArea").style.display = "none";
 
   document.getElementById("endScreen").style.display = "flex";
 
-  const total =
-    sCount + aCount + bCount + cCount;
-
   document.getElementById("stats").innerHTML =
 
-    `⭐ S Tier: ${sCount}<br>
-     🟢 A Tier: ${aCount}<br>
-     🔵 B Tier: ${bCount}<br>
-     🔴 C Tier: ${cCount}<br><br>
-     📊 Ranked: ${total}`;
+    `👑 S Tier: ${sCount}<br><br>
+     🔥 A Tier: ${aCount}<br><br>
+     👍 B Tier: ${bCount}<br><br>
+     👎 C Tier: ${cCount}`;
 }
 
-/* =========================
-   RESTART
-========================= */
-
+/* RESTART */
 function restart(){
 
   document.querySelector(".card").style.display = "block";
-
   document.querySelector(".bottomBar").style.display = "flex";
-
   document.getElementById("topArea").style.display = "flex";
 
   document.getElementById("endScreen").style.display = "none";
@@ -789,32 +690,16 @@ function restart(){
   start();
 }
 
-/* =========================
-   BUTTONS
-========================= */
+/* BUTTONS */
+document.getElementById("sTier").onclick = () => chooseTier("S");
+document.getElementById("aTier").onclick = () => chooseTier("A");
+document.getElementById("bTier").onclick = () => chooseTier("B");
+document.getElementById("cTier").onclick = () => chooseTier("C");
 
-document.getElementById("sTier").onclick =
-  () => rate("s");
+document.getElementById("skip").onclick = skip;
+document.getElementById("back").onclick = back;
 
-document.getElementById("aTier").onclick =
-  () => rate("a");
-
-document.getElementById("bTier").onclick =
-  () => rate("b");
-
-document.getElementById("cTier").onclick =
-  () => rate("c");
-
-document.getElementById("skip").onclick =
-  skip;
-
-document.getElementById("back").onclick =
-  back;
-
-/* =========================
-   START
-========================= */
-
+/* START */
 start();
 
 </script>
